@@ -5,3 +5,5 @@ to get the code. They will also offer support.
 
 I publish it so you can see how it's made and what you can do with it.
 
+The official website of the author: http://app.ohanah.com/
+
