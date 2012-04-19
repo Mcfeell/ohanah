@@ -1,0 +1,248 @@
+<?php 
+/**
+ * @version		2.0.1
+ * @package		com_ohanah
+ * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
+ * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
+ * @link        http://www.beyounic.com
+ */
+
+defined( '_JEXEC' ) or die( 'Restricted access' );
+
+
+class ComOhanahControllerRegistration extends ComDefaultControllerDefault
+{
+	public function __construct(KConfig $config)
+	{
+		parent::__construct($config);
+		
+		if (JComponentHelper::getParams('com_ohanah')->get('enableMailchimp')) {
+			$this->registerCallback('after.add', array($this, 'addAttendeToMailchimpList'));
+		}
+	}
+		
+	public function addAttendeToMailchimpList() {
+		$event = $this->getService('com://site/ohanah.model.events')->id(KRequest::get('post.ohanah_event_id', 'int'))->getItem();
+
+		if ($event->mailchimp_list_id) {
+			$registration = $this->getService('com://site/ohanah.model.registrations')->id(KRequest::get('post.ohanah_registration_id', 'int'))->getItem();
+			$this->pushOnMailchimp($registration->email, $registration->name, $event->mailchimp_list_id);
+		}
+	}
+
+	public function pushOnMailchimp($email, $name, $listId)
+	{
+		$apiKey = JComponentHelper::getParams('com_ohanah')->get('mailchimpApiKey');
+		 
+		$double_optin=false;
+		$update_existing=true;
+		$replace_interests=true;
+		$send_welcome=false;
+		$email_type = 'html';
+		
+		$merges = array('FNAME'=> $name);
+	
+		$data = array(
+		        'email_address' 	=> $email,
+		        'apikey' 			=> $apiKey,
+		        'merge_vars' 		=> $merges,
+		        'id' 				=> $listId,
+		        'double_optin' 		=> $double_optin,
+		        'update_existing' 	=> $update_existing,
+		        'replace_interests' => $replace_interests,
+		        'send_welcome' 		=> $send_welcome,
+		        'email_type' 		=> $email_type
+		    );
+		    
+		$payload = json_encode($data);
+		 
+		$submit_url = 'http://'.substr($apiKey, strlen($apiKey)-3, 3).'.api.mailchimp.com/1.3/?method=listSubscribe';
+	
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $submit_url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, urlencode($payload));
+		 
+		$result = curl_exec($ch);
+		curl_close ($ch);
+		$data = json_decode($result);
+				
+		if (isset($data->error)){
+		    //error_log($data->code .' : '.$data->error."\n");
+		} else {
+		    //error_log("success, look for the confirmation message\n");
+		}
+	}
+
+	public function processParams() {
+		$params = 'field_name_person_1='.KRequest::get('post.field_name_person_1', 'string').PHP_EOL;
+		$params .= 'field_name_person_2='.KRequest::get('post.field_name_person_2', 'string').PHP_EOL;
+		$params .= 'field_name_person_3='.KRequest::get('post.field_name_person_3', 'string').PHP_EOL;
+		$params .= 'field_name_person_4='.KRequest::get('post.field_name_person_4', 'string').PHP_EOL;
+		$params .= 'field_name_person_5='.KRequest::get('post.field_name_person_5', 'string').PHP_EOL;
+
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_1_person_'.$i.'='.KRequest::get('post.custom_field_value_1_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_2_person_'.$i.'='.KRequest::get('post.custom_field_value_2_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_3_person_'.$i.'='.KRequest::get('post.custom_field_value_3_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_4_person_'.$i.'='.KRequest::get('post.custom_field_value_4_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_5_person_'.$i.'='.KRequest::get('post.custom_field_value_5_person_'.$i, 'string').PHP_EOL;
+
+		return $params;
+	}
+	
+
+	protected function _actionAdd(KCommandContext $context)
+	{	
+		$context->data['params'] = $this->processParams();
+
+		//Override KControllerService to prevent problem Resource Already Exists
+		$data = $this->getModel()->getItem();
+	    $data->setData(KConfig::unbox($context->data));
+	    
+	    //Only throw an error if the action explicitly failed.
+	    if($data->save() === false) 
+	    {    
+		    $error = $data->getStatusMessage();
+	        $context->setError(new KControllerException(
+	           $error ? $error : 'Add Action Failed', KHttpResponse::INTERNAL_SERVER_ERROR
+	        ));
+	       
+	    } 
+	    else $context->status = KHttpResponse::CREATED;
+		//END Override KControllerService to prevent problem Resource Already Exists
+
+		KRequest::set('post.ohanah_registration_id', $data->id);
+
+		$event = $this->getService('com://site/ohanah.model.events')->id(KRequest::get('post.ohanah_event_id', 'int'))->getItem();
+
+		$this->getService('com://admin/ohanah.controller.mixpanel')->ohstats('new_registration', array('number_of_tickets'=> KRequest::get('post.number_of_tickets', 'string'), 'ticket_cost' => $event->ticket_cost.' '.JComponentHelper::getParams('com_ohanah')->get('payment_currency')));
+
+		if (JComponentHelper::getParams('com_ohanah')->get('enableEmailNewRegistration')) 
+		{
+			//Notify the organizer / admin
+			$subject = JComponentHelper::getParams('com_ohanah')->get('subject_mail_new_registration_organizer');
+			$message = JComponentHelper::getParams('com_ohanah')->get('text_mail_new_registration_organizer');
+
+			$subject = str_replace('{TITLE}', KRequest::get('post.title', 'string'), $subject);
+			$subject = str_replace('{NAME}', KRequest::get('post.name', 'string'), $subject);
+			$subject = str_replace('{EMAIL}', KRequest::get('post.email', 'string'), $subject);
+			$subject = str_replace('{TICKETS}', KRequest::get('post.number_of_tickets', 'string'), $subject);
+			$subject = str_replace('{NOTES}', KRequest::get('post.notes', 'string'), $subject);
+			$subject = str_replace('{EVENT_TITLE}', $event->title, $subject);
+			$subject = str_replace('{EVENT_LINK}', '', $subject);
+
+			$message = str_replace('{TITLE}', KRequest::get('post.title', 'string'), $message);
+			$message = str_replace('{NAME}', KRequest::get('post.name', 'string'), $message);
+			$message = str_replace('{EMAIL}', KRequest::get('post.email', 'string'), $message);
+			$message = str_replace('{TICKETS}', KRequest::get('post.number_of_tickets', 'string'), $message);
+			$message = str_replace('{NOTES}', KRequest::get('post.notes', 'string'), $message);
+			$message = str_replace('{EVENT_TITLE}', $event->title, $message);
+
+			if (JComponentHelper::getParams('com_ohanah')->get('itemid')) $itemid = '&Itemid='.JComponentHelper::getParams('com_ohanah')->get('itemid'); else $itemid = '';
+			$message = str_replace('{EVENT_LINK}', 'http://'.$_SERVER['HTTP_HOST'].JRoute::_('index.php?option=com_ohanah&view=event&id='.$event->id.$itemid), $message);
+
+			$emailAddress = JFactory::getConfig()->getValue('mailfrom');
+			if (JComponentHelper::getParams('com_ohanah')->get('destination_email')) {
+				$emailAddress = JComponentHelper::getParams('com_ohanah')->get('destination_email');
+			}		
+
+			JUtility::sendMail(JFactory::getConfig()->getValue('mailfrom'), JFactory::getConfig()->getValue('fromname'), $emailAddress, $subject, $message, true);
+		}
+
+		if (JComponentHelper::getParams('com_ohanah')->get('enableEmailRegistrationConfirmation')) {
+			//Notify the user
+			$subject = JComponentHelper::getParams('com_ohanah')->get('subject_mail_new_registration_registrant');
+			$message = JComponentHelper::getParams('com_ohanah')->get('text_mail_new_registration_registrant');
+
+			$subject = str_replace('{TITLE}', KRequest::get('post.title', 'string'), $subject);
+			$subject = str_replace('{NAME}', KRequest::get('post.name', 'string'), $subject);
+			$subject = str_replace('{EMAIL}', KRequest::get('post.email', 'string'), $subject);
+			$subject = str_replace('{TICKETS}', KRequest::get('post.number_of_tickets', 'string'), $subject);
+			$subject = str_replace('{NOTES}', KRequest::get('post.notes', 'string'), $subject);
+			$subject = str_replace('{EVENT_TITLE}', $event->title, $subject);
+			$subject = str_replace('{EVENT_LINK}', '', $subject);
+
+			$message = str_replace('{TITLE}', KRequest::get('post.title', 'string'), $message);
+			$message = str_replace('{NAME}', KRequest::get('post.name', 'string'), $message);
+			$message = str_replace('{EMAIL}', KRequest::get('post.email', 'string'), $message);
+			$message = str_replace('{TICKETS}', KRequest::get('post.number_of_tickets', 'string'), $message);
+			$message = str_replace('{NOTES}', KRequest::get('post.notes', 'string'), $message);
+			$message = str_replace('{EVENT_TITLE}', $event->title, $message);
+			if (JComponentHelper::getParams('com_ohanah')->get('itemid')) $itemid = '&Itemid='.JComponentHelper::getParams('com_ohanah')->get('itemid'); else $itemid = '';
+			$message = str_replace('{EVENT_LINK}', 'http://'.$_SERVER['HTTP_HOST'].JRoute::_('index.php?option=com_ohanah&view=event&id='.$event->id.$itemid), $message);
+
+			$emailAddress = KRequest::get('post.email', 'string');
+
+			JUtility::sendMail(JFactory::getConfig()->getValue('mailfrom'), JFactory::getConfig()->getValue('fromname'), $emailAddress, $subject, $message, true);
+		}		
+
+		$this->getRedirect();
+	}
+		
+	public function getRedirect()
+	{
+		$action = KRequest::get('post.action', 'string');
+
+		if ($action == "add") 
+		{
+			$event = $this->getService('com://site/ohanah.model.events')->id(KRequest::get('post.ohanah_event_id', 'int'))->getItem();
+			$url = 'index.php?option=com_ohanah&view=event&id='.$event->id.'&Itemid='.KRequest::get('post.Itemid', 'int');
+
+			if ($event->ticket_cost) 
+			{
+
+				if ($event->payment_gateway == 'custom') {	
+					$url = $event->custom_payment_url;
+				} else if ($event->payment_gateway == 'paypal') {
+					$number_of_tickets = KRequest::get('post.number_of_tickets', 'int');
+					
+					$url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick'.
+							'&business='.JComponentHelper::getParams('com_ohanah')->get('paypal_email').
+							'&email='.KRequest::get('post.email', 'raw').
+							'&amount='.$event->ticket_cost.
+							'&quantity='.$number_of_tickets.
+							'&custom='.KRequest::get('post.ohanah_registration_id', 'int').
+							'&currency_code='.JComponentHelper::getParams('com_ohanah')->get('payment_currency').
+							'&item_name='.$number_of_tickets.' tickets to '.$event->title.
+							'&return='.urlencode('http://'.$_SERVER["HTTP_HOST"].JRoute::_('index.php?option=com_ohanah&view=event&id='.$event->id.'&Itemid='.KRequest::get('post.Itemid', 'int'))).
+							'&cancel_return='.urlencode('http://'.$_SERVER["HTTP_HOST"].JRoute::_('index.php?option=com_ohanah&view=event&id='.$event->id.'&Itemid='.KRequest::get('post.Itemid', 'int')));
+				}
+			}
+			
+			return $result = array(
+				'message' 		=> JText::_('YOU_HAVE_JOINED_THIS_EVENT'),
+				'messageType' 	=> 'Notice',
+				'url' 			=> JRoute::_($url, false),
+			);
+		}
+		else 
+		{			
+			$result = array();
+			
+			if(!empty($this->_redirect))
+			{
+				$url = $this->_redirect;
+			
+				//Create the url if no full URL was passed
+				if(strrpos($url, '?') === false) 
+				{
+					$url = 'index.php?option=com_'.$this->getIdentifier()->package.'&'.$url;
+				}
+			
+				$result = array(
+					'url' 			=> JRoute::_($url, false),
+					'message' 		=> $this->_message,
+					'messageType' 	=> $this->_messageType,
+				);
+			}
+			
+			return $result;
+		}
+	}
+}
