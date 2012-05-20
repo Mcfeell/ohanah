@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		2.0.1b2
+ * @version		2.0.14b2
  * @package		mod_ohanahcategoryinfo
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>

@@ -7,7 +7,7 @@
 <input type="hidden" id="latlng" name="latlng" value="<?=htmlspecialchars(@$item->latlng)?>" />
 <input type="hidden" id="timezone" name="timezone" value="<?=htmlspecialchars(@$item->timezone)?>" />
 
-<script src="http://maps.google.com/maps/api/js?sensor=false" />
+<script src="//maps.google.com/maps/api/js?sensor=false" />
 <script>
 	$jq(function() {
 		var map;
@@ -25,10 +25,9 @@
 			var options = {
 		    	zoom: 15,
 		    	center: latlng,
-		    	backgroundColor: 'none',
 		    	mapTypeId: google.maps.MapTypeId.ROADMAP,
 		    	scrollwheel: false,
-		    	streetViewControl: false,
+		    	streetViewControl: false
 		  	};
 
 		  	map = new google.maps.Map(document.getElementById("map_canvas_form"), options);
@@ -38,7 +37,7 @@
 		    	map: map,
 		    	draggable: true,
 		    	position: latlng,
-		    	icon: 'http://<?=$_SERVER['HTTP_HOST'].str_replace('/administrator', '', KRequest::base())?>/media/com_ohanah/images/ohapp_mapmarker.png',
+		    	icon: '//<?=$_SERVER['HTTP_HOST'].str_replace('/administrator', '', KRequest::base())?>/media/com_ohanah/images/ohapp_mapmarker.png'
 		  	});
 		}
 
@@ -48,10 +47,11 @@
 		   		$jq("#address").autocomplete({
 			      	//This bit uses the geocoder to fetch address values
 			      	source: function(request, response) {
+
 			        	geocoder.geocode( {'address': request.term }, function(results, status) {
 			          		response($jq.map(results, function(item) {
 			            		return {
-			              			label:  item.formatted_address,
+			              			label: item.formatted_address,
 			              			value: item.formatted_address,
 									latitude: item.geometry.location.lat(),
 						            longitude: item.geometry.location.lng()
@@ -117,7 +117,7 @@
 			      	//This bit is executed upon selection of an address
 			      	select: function(event, ui) {
 			        	$jq("#latitude").val(ui.item.latitude);
-				  		$jq.get('index.php?option=com_ohanah&view=venue&title='+ui.item.value+'&format=json',
+				  		$jq.get('http://<?=$_SERVER['HTTP_HOST'].KRequest::root()?>/index.php?option=com_ohanah&view=venue&title='+ui.item.value+'&format=json',
 			  				'',
 			  				function(response, status) {
 								$jq('#address').val(response.item.address);

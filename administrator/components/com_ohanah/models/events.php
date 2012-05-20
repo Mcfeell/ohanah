@@ -2,7 +2,7 @@
 
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -24,7 +24,7 @@ class ComOhanahModelEvents extends KModelTable
 			 ->insert('ohanah_venue_id', 'int')		
 			 ->insert('filterEvents', 'string')
 			 ->insert('frontend_submitted', 'int')
-			 ->insert('enabled', 'int')
+			 ->insert('emptySlug', 'int')
 			 ->insert('enabled', 'int')
 			 ->insert('published', 'string');
 	}
@@ -38,7 +38,11 @@ class ComOhanahModelEvents extends KModelTable
 			$query->where('tbl.description', 'LIKE',  $search);
 			$query->where('tbl.title', 'LIKE',  $search, 'OR');
 		}
-				
+		
+		if ($state->emptySlug) {
+			$query->where('slug', '=', '');
+		}
+
 		if ($state->ohanah_category_id) 
 			$query->where('ohanah_category_id', '=',  $state->ohanah_category_id);
 			

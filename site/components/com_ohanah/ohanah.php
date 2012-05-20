@@ -1,6 +1,6 @@
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -26,6 +26,8 @@ KService::setAlias('com://site/ohanah.database.row.event', 'com://admin/ohanah.d
 KService::setAlias('com://site/ohanah.database.row.registration', 'com://admin/ohanah.database.row.registration');
 KService::setAlias('com://site/ohanah.database.behavior.sluggable', 'com://admin/ohanah.database.behavior.sluggable');
 KService::setAlias('com://site/ohanah.filter.slug', 'com://admin/ohanah.filter.slug');
+
+if (KRequest::get('get.view', 'string') == '') KRequest::set('get.view', 'events');
 
 try {
 	echo KService::get('com://site/ohanah.dispatcher')->dispatch();

@@ -1,6 +1,6 @@
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -68,8 +68,8 @@ class paypal_ipn
 
 	function send_response()
 	{
-		//$fp = @fsockopen( "www.sandbox.paypal.com", 80, &$errno, &$errstr, 120 ); 
-  		$fp = @fsockopen( "www.paypal.com", 80, $errno, $errstr, 120 ); 
+		//$fp = fsockopen('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 120);
+		$fp = fsockopen('ssl://www.paypal.com', 443, $errno, $errstr, 120);
 
 		if (!$fp) { 
 			$this->error_out("PHP fsockopen() error: " . $errstr , "");

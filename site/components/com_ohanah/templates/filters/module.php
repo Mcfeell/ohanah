@@ -1,5 +1,7 @@
 <?php
 
+ini_set('pcre.backtrack_limit', '200000');
+
 class ComOhanahTemplateFilterModule extends ComDefaultTemplateFilterModule
 {
 }
@@ -7,7 +9,7 @@ class ComOhanahTemplateFilterModule extends ComDefaultTemplateFilterModule
 
 <?php if (!JComponentHelper::getParams('com_ohanah')->get('disableModuleInjector')) : ?>
 
-	<?php if (!file_exists(JPATH_ROOT.'/plugins/system/advancedmodules/advancedmodules.php') && (substr(JFactory::getApplication()->getTemplate(), 0, 3) != 'ja_')) : ?>
+	<?php if (!file_exists(JPATH_ROOT.'/plugins/system/advancedmodules/advancedmodules.php') && (substr(JFactory::getApplication()->getTemplate(), 0, 3) != 'ja_') && (substr(JFactory::getApplication()->getTemplate(), 0, 2) != 'jb')) : ?>
 
 		<?php 
 		$joomlaVersion = JVersion::isCompatible('1.6.0') ? '1.6' : '1.5';
@@ -871,219 +873,431 @@ class ComOhanahTemplateFilterModule extends ComDefaultTemplateFilterModule
 		<?php if (file_exists(JPATH_THEMES.'/'.JFactory::getApplication()->getTemplate().'/warp/classes/object.php')) : ?>
 			<?php
 
+			/* Warp 5.5 */
+
 			require_once(JPATH_THEMES.'/'.JFactory::getApplication()->getTemplate().'/warp/classes/object.php');
 			require_once(JPATH_THEMES.'/'.JFactory::getApplication()->getTemplate().'/warp/classes/helper.php');
 
-			/* Warp 5.5 */
+			if (JFactory::getApplication()->getTemplate() == 'yoo_bloc' || JFactory::getApplication()->getTemplate() == 'yoo_corona') {
+				class WarpHelperModules extends WarpHelper {
 
-			class WarpHelperModules extends WarpHelper {
-
-			    /*
-					Variable: _document
-						Document.
-			    */
-				var $_document;
-				
-			    /*
-					Variable: _renderer
-						Module renderer.
-			    */
-				var $_renderer;
-
-				/*
-					Function: Constructor
-						Class Constructor.
-				*/
-				function __construct() {
-					parent::__construct();
-
-					// init vars
-					$this->_document = JFactory::getDocument();
-					$this->_renderer = $this->_document->loadRenderer('module');
-				}
-				
-				
-				/*
-					Function: count
-						Retrieve the active module count at a position
-
-					Returns:
-						Int
-				*/
-				function count($position) {
-
-					// init vars
-					$document =& JFactory::getDocument();
-
-					$count = $document->countModules($position);
-				    $count += count(@JFactory::getDocument()->modules[$position]);
-
-					return $count;
-				}
-
-				/*
-					Function: render
-						Shortcut to render a position
-
-					Returns:
-						String
-				*/
-				function render($position, $args = array()) {
-
-					// set position in arguments
-					$args['position'] = $position;
-
-					return $this->warp->template->render('modules', $args);
-				}
-
-				/*
-					Function: load
-						Retrieve a module objects of a position
-
-					Returns:
-						Array
-				*/
-				function load($position) {
-
-					// init vars
-					$modules =& JModuleHelper::getModules($position);
-
-					$injected = @JFactory::getDocument()->modules[$position];
+				    /*
+						Variable: _document
+							Document.
+				    */
+					var $_document;
 					
-					if ($injected) foreach ($injected as $module) {
-						$modules[] = $module;
+				    /*
+						Variable: _renderer
+							Module renderer.
+				    */
+					var $_renderer;
+
+					/*
+						Function: Constructor
+							Class Constructor.
+					*/
+					function __construct() {
+						parent::__construct();
+
+						// init vars
+						$this->_document =& JFactory::getDocument();
+						$this->_renderer =& $this->_document->loadRenderer('module');
 					}
 
-					// set params, force no style
-					$params['style'] = 'none';
-					
-					// get modules content
-					foreach ($modules as $index => $module)  {
-						
-						// set module params
-						$module->parameter = new JRegistry($module->params);
-						
-						// set parameter show all children for accordion menu
-						if ($module->module == 'mod_menu') {
-							if (strpos($module->parameter->get('class_sfx', ''), 'accordion') !== false) {
-								
-								if ($module->parameter->get('showAllChildren') == 0) {
-									$module->parameter->set('showAllChildren', 1);					
-									$module->showAllChildren = 0;
-								} else {
-									$module->showAllChildren = 1;
-								}
+					/*
+						Function: count
+							Retrieve the active module count at a position
 
-								$module->params = $module->parameter->toString();
+						Returns:
+							Int
+					*/
+					function count($position) {
+						// init vars
+						$document =& JFactory::getDocument();
+
+						$count = $document->countModules($position);
+					    $count += count(@JFactory::getDocument()->modules[$position]);
+
+					    return $count;
+					}
+
+					/*
+						Function: render
+							Shortcut to render a position
+
+						Returns:
+							String
+					*/
+					function render($position, $args = array()) {
+
+						// set position in arguments
+						$args['position'] = $position;
+
+						return $this->warp->template->render('modules', $args);
+					}
+
+					/*
+						Function: load
+							Retrieve a module objects of a position
+
+						Returns:
+							Array
+					*/
+					function load($position) {
+
+						// init vars
+						$modules =& JModuleHelper::getModules($position);
+
+						$injected = @JFactory::getDocument()->modules[$position];
+							
+						if ($injected) {
+							foreach (array_reverse($injected) as $module) {
+								$modules[] = $module;
 							}
 						}
-						
-						$modules[$index]->content = $this->_renderer->render($module, $params);
+
+						// set params, force no style
+						$params['style'] = 'none';
+
+						// get modules content
+						foreach ($modules as $index => $mod)  {		    
+							
+							$module =& $modules[$index];
+							
+							// set module params
+							$module->parameter = new JParameter($module->params);
+				  		
+							// set parameter show all children for accordion menu
+							if ($module->module == 'mod_mainmenu') {
+								if (strpos($module->parameter->get('class_sfx', ''), 'accordion') !== false) {
+
+									if ($module->parameter->get('showAllChildren') == 0) {
+										$module->parameter->set('showAllChildren', 1);					
+										$module->showAllChildren = 0;
+									} else {
+										$module->showAllChildren = 1;
+									}
+
+									$module->params = $module->parameter->toString();
+								}
+							}
+
+							$modules[$index]->content = $this->_renderer->render($module, $params);
+						}
+
+						return $modules;
 					}
 
-					return $modules;
 				}
+			} else {
+				class WarpHelperModules extends WarpHelper {
 
+				    /*
+						Variable: _document
+							Document.
+				    */
+					var $_document;
+					
+				    /*
+						Variable: _renderer
+							Module renderer.
+				    */
+					var $_renderer;
+
+					/*
+						Function: Constructor
+							Class Constructor.
+					*/
+					function __construct() {
+						parent::__construct();
+
+						// init vars
+						$this->_document = JFactory::getDocument();
+						$this->_renderer = $this->_document->loadRenderer('module');
+					}
+					
+					
+					/*
+						Function: count
+							Retrieve the active module count at a position
+
+						Returns:
+							Int
+					*/
+					function count($position) {
+
+						// init vars
+						$document =& JFactory::getDocument();
+
+						$count = $document->countModules($position);
+					    $count += count(@JFactory::getDocument()->modules[$position]);
+
+						return $count;
+					}
+
+					/*
+						Function: render
+							Shortcut to render a position
+
+						Returns:
+							String
+					*/
+					function render($position, $args = array()) {
+
+						// set position in arguments
+						$args['position'] = $position;
+
+						return $this->warp->template->render('modules', $args);
+					}
+
+					/*
+						Function: load
+							Retrieve a module objects of a position
+
+						Returns:
+							Array
+					*/
+					function load($position) {
+
+						// init vars
+						$modules =& JModuleHelper::getModules($position);
+						
+						$injected = @JFactory::getDocument()->modules[$position];
+							
+						if ($injected) {
+							foreach (array_reverse($injected) as $module) {
+								$modules[] = $module;
+							}
+						}
+
+						// set params, force no style
+						$params['style'] = 'none';
+						
+						// get modules content
+						foreach ($modules as $index => $module)  {
+							
+							// set module params
+							$module->parameter = new JRegistry($module->params);
+							
+							// set parameter show all children for accordion menu
+							if ($module->module == 'mod_menu') {
+								if (strpos($module->parameter->get('class_sfx', ''), 'accordion') !== false) {
+									
+									if ($module->parameter->get('showAllChildren') == 0) {
+										$module->parameter->set('showAllChildren', 1);					
+										$module->showAllChildren = 0;
+									} else {
+										$module->showAllChildren = 1;
+									}
+
+									$module->params = $module->parameter->toString();
+								}
+							}
+							
+							$modules[$index]->content = $this->_renderer->render($module, $params);
+						}
+
+						return $modules;
+					}
+				}
 			}
+
+
+			
 
 			?>
 
 		<?php elseif (file_exists(JPATH_THEMES.'/'.JFactory::getApplication()->getTemplate().'/warp/classes/helper.php')) : ?>
 
 			<?php
-			require_once(JPATH_THEMES.'/'.JFactory::getApplication()->getTemplate().'/warp/classes/helper.php');
-
 			/* Warp 6 */
-			class ModulesWarpHelper extends WarpHelper {
 
-			    /*
-					Variable: _document
-						Document.
-			    */
-				public $_document;
-				
-			    /*
-					Variable: _renderer
-						Module renderer.
-			    */
-				public $_renderer;
+			require_once(JPATH_THEMES.'/'.JFactory::getApplication()->getTemplate().'/warp/classes/helper.php');
+			$joomlaVersion = JVersion::isCompatible('1.6.0') ? '1.6' : '1.5';
+			if ($joomlaVersion == '1.5') { 
 
-				/*
-					Function: Constructor
-						Class Constructor.
-				*/
-				public function __construct() {
-					parent::__construct();
+				class ModulesWarpHelper extends WarpHelper {
 
-					// init vars
-					$this->_document = JFactory::getDocument();
-					$this->_renderer = $this->_document->loadRenderer('module');
-				}
-				
-				
-				/*
-					Function: count
-						Retrieve the active module count at a position
-
-					Returns:
-						Int
-				*/
-				public function count($position) {
-				    $count = $this->_document->countModules($position);
-
-				    $count += count(@JFactory::getDocument()->modules[$position]);
-
-					return $count;
-				}
-
-				/*
-					Function: render
-						Shortcut to render a position
-
-					Returns:
-						String
-				*/
-				public function render($position, $args = array()) {
-
-					// set position in arguments
-					$args['position'] = $position;
-
-					return $this['template']->render('modules', $args);
-				}
-
-
-				/*
-					Function: load
-						Retrieve a module objects of a position
-
-					Returns:
-						Array
-				*/
-				public function load($position) {
-
-					// init vars
-					$modules = JModuleHelper::getModules($position);
+				    /*
+						Variable: _document
+							Document.
+				    */
+					protected $_document;
 					
-					$injected = @JFactory::getDocument()->modules[$position];
-					
-					if ($injected) foreach ($injected as $module) {
-						$modules[] = $module;
+				    /*
+						Variable: _renderer
+							Module renderer.
+				    */
+					protected $_renderer;
+
+					/*
+						Function: Constructor
+							Class Constructor.
+					*/
+					public function __construct() {
+						parent::__construct();
+
+						// init vars
+						$this->_document = JFactory::getDocument();
+						$this->_renderer = $this->_document->loadRenderer('module');
 					}
 
-					// set params, force no style
-					$params['style'] = 'none';
-					
-					// get modules content
-					foreach ($modules as $module)  {
-						$module->parameter = new JRegistry($module->params);
-						$module->menu = $module->module == 'mod_menu';
-						$module->content = $this->_renderer->render($module, $params);
+					/*
+						Function: count
+							Retrieve the active module count at a position
+
+						Returns:
+							Int
+					*/
+					public function count($position) {
+						return $this->_document->countModules($position);
 					}
 
-					return $modules;
+					/*
+						Function: render
+							Shortcut to render a position
+
+						Returns:
+							String
+					*/
+					public function render($position, $args = array()) {
+
+						// set position in arguments
+						$args['position'] = $position;
+
+						return $this['template']->render('modules', $args);
+					}
+
+					/*
+						Function: load
+							Retrieve a module objects of a position
+
+						Returns:
+							Array
+					*/
+					public function load($position) {
+
+						// init vars
+						$modules = JModuleHelper::getModules($position);
+
+						$injected = @JFactory::getDocument()->modules[$position];
+							
+						if ($injected) {
+							foreach (array_reverse($injected) as $module) {
+								$modules[] = $module;
+							}
+						}
+
+						// set params, force no style
+						$params['style'] = 'none';
+
+						// get modules content
+						foreach ($modules as $module)  {
+							$module->parameter = new JParameter($module->params);
+							$module->menu = $module->module == 'mod_mainmenu';
+							$module->content = $this->_renderer->render($module, $params);
+						}
+
+						return $modules;
+					}
 				}
 
+			} else {
+
+				class ModulesWarpHelper extends WarpHelper {
+
+				    /*
+						Variable: _document
+							Document.
+				    */
+					public $_document;
+					
+				    /*
+						Variable: _renderer
+							Module renderer.
+				    */
+					public $_renderer;
+
+					/*
+						Function: Constructor
+							Class Constructor.
+					*/
+					public function __construct() {
+						parent::__construct();
+
+						// init vars
+						$this->_document = JFactory::getDocument();
+						$this->_renderer = $this->_document->loadRenderer('module');
+					}
+					
+					
+					/*
+						Function: count
+							Retrieve the active module count at a position
+
+						Returns:
+							Int
+					*/
+					public function count($position) {
+					    $count = $this->_document->countModules($position);
+
+					    $count += count(@JFactory::getDocument()->modules[$position]);
+
+						return $count;
+					}
+
+					/*
+						Function: render
+							Shortcut to render a position
+
+						Returns:
+							String
+					*/
+					public function render($position, $args = array()) {
+
+						// set position in arguments
+						$args['position'] = $position;
+
+						return $this['template']->render('modules', $args);
+					}
+
+
+					/*
+						Function: load
+							Retrieve a module objects of a position
+
+						Returns:
+							Array
+					*/
+					public function load($position) {
+
+						// init vars
+						$modules = JModuleHelper::getModules($position);
+						$injected = @JFactory::getDocument()->modules[$position];
+						
+						if ($injected) {
+							foreach (array_reverse($injected) as $module) {
+								$modules[] = $module;
+							}
+						}
+						
+						// set params, force no style
+						$params['style'] = 'none';
+						
+						// get modules content
+						foreach ($modules as $module)  {
+							$module->parameter = new JRegistry($module->params);
+							$module->menu = $module->module == 'mod_menu';
+							$module->content = $this->_renderer->render($module, $params);
+						}
+
+						return $modules;
+					}
+
+				}
 			}
+			
 			?>
 
 		<?php endif ?>

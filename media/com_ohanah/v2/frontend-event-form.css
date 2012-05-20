@@ -1,21 +1,8 @@
 /* admin headers and toolbars */
-div.header{
-	font-size:20px;
-	font-weight:bold;
-	color:#455868;
-	line-height:28px !important;
-	padding:15px 0 15px 65px !important;
-}
-
-div.header .subhead{
-	font-size:15px;
-	color:#8996a2;
-}
 
 div.toolbar{
 	text-align:left !important;
-	float:right;
-	
+	float:right;	
 }
 
 #content-box{
@@ -573,7 +560,7 @@ table.toolbar td{
 }
 
 .panelContent .dropdown.size2 select {
-	width:222px;
+	width:182px;
 }
 
 .panelContent .dropdown.size3 select {
@@ -614,7 +601,7 @@ input.size7{
 }
 
 .dropdown.size2{
-	width: 170px;
+	width: 150px;
 }
 
 .dropdown.size3{
@@ -645,7 +632,7 @@ input.size7{
 }
 
 .panelContent input.seventy{
-	width:224px;
+	width:204px;
 }
 
 .panelContent input.fifty{
@@ -656,6 +643,8 @@ input.size7{
 	width:44px !important;
 	float:right;
 }
+
+
 
 .small{
 	font-size:11px;
@@ -738,15 +727,14 @@ input, textarea, select {
    -webkit-appearance: none;
 }
 
-input[type=checkbox], input[type=radio] {
+.ohanah input[type=checkbox], input[type=radio] {
 	-webkit-box-shadow: 1px 1px 1px #fff;
    display: inline-block;
    font-size: 15px;
    line-height: 1em;
-   margin: 0 0.25em 0 0;
-   padding: 0;
-   width: 14px;
-   height: 14px;
+   
+   width: 14px !important;
+   height: 14px !important;
    vertical-align: text-top;
 }
 
@@ -758,12 +746,12 @@ input[type=radio]:checked {
    background: url("ohanah_images/selected.png") no-repeat center center;
 }
 
-input[type=checkbox] {
-   background: url("ohanah_images/unchecked.png") no-repeat center center;
+.ohanah input[type=checkbox] {
+   background: url("ohanah_images/unchecked.png") no-repeat center center !important;
 }
 
-input[type=checkbox]:checked {
-   background: url("ohanah_images/checked.png") no-repeat center center;
+.ohanah input[type=checkbox]:checked {
+   background: url("ohanah_images/checked.png") no-repeat center center !important;
 }
 
 #minwidth-body #content-box .padding {
@@ -771,11 +759,8 @@ input[type=checkbox]:checked {
 }
 
 /*footer*/
-.copyright{
-	text-align:center;
-}
 
-.clearfix:after {
+.ohanah .clearfix:after {
 	content: ".";
 	display: block;
 	clear: both;
@@ -784,15 +769,15 @@ input[type=checkbox]:checked {
 	height: 0;
 }
  
-.clearfix {
+.ohanah .clearfix {
 	display: inline-block;
 }
  
-html[xmlns] .clearfix {
+.ohanah html[xmlns] .clearfix {
 	display: block;
 }
  
-* html .clearfix {
+html .ohanah .clearfix {
 	height: 1%;
 }
 
@@ -1133,13 +1118,13 @@ table.toolbar{
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover,
 .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus{
 	border: 0 none !important;
-	background: url("ohanah_css/custom-theme/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
+	background: url("../css/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
 	color:#FFFFFF !important;
 }
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active{
 	color:#FFFFFF !important;
-	background: url("ohanah_css/custom-theme/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
+	background: url("../css/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
 }
 
 .ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight{
@@ -1147,7 +1132,7 @@ table.toolbar{
 }
 
 .ui-state-hover, .ui-icon, .ui-state-focus, .ui-icon{
-	background-image:url("ohanah_css/custom-theme/images/ui-icons_ffffff_256x240.png") !important;
+	background-image:url("../css/images/ui-icons_ffffff_256x240.png") !important;
 }
 
 .ui-datepicker-prev.ui-state-hover, .ui-datepicker-next.ui-state-hover {
@@ -1237,11 +1222,10 @@ div.header h2 {
 	color: #455868;
 }
 
-
-
 #system-message dd.message ul {
     background-color: #fff !important;
     background-image: url(ohanah_images/notice-info.png) !important;
+    background-repeat: no-repeat;
 }
 
 #system-message dd ul {
@@ -1375,3 +1359,8 @@ td.start .validation-advice {
 	border: none !important;
 }
 /* end border template fixes */
+
+.ohanah form div {
+	margin:0!important;
+}
+

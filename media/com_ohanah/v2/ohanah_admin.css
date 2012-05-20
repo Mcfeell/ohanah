@@ -37,8 +37,7 @@ div.toolbar{
 	background:none !important;
 	margin-bottom:0 !important;
 	background: #FFFFFF !important;
-	z-index: 9999999999999999999999;
-	
+	z-index: 99999;
 }
 
 #toolbar-box.alert{
@@ -612,6 +611,8 @@ table.toolbar td{
 	width:143px;
 }
 
+
+
 input.size5{
 	width:299px !important;
 }
@@ -641,6 +642,16 @@ input.size6{
 .dropdown.size3{
 	width: 59px;
 }
+
+/* used to display time in event form */
+.dropdown.size3.time, .dropdown.size3.time select{ 
+	width:87px;
+}
+
+.dropdown.size3.time.ampm, .dropdown.size3.time.ampm select{ 
+	width:54px;
+}
+
 
 .dropdown.size4{
 	width: 112px;
@@ -1173,13 +1184,13 @@ table.toolbar{
 .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover,
 .ui-state-focus, .ui-widget-content .ui-state-focus, .ui-widget-header .ui-state-focus{
 	border: 0 none !important;
-	background: url("ohanah_css/custom-theme/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
+	background: url("../css/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
 	color:#FFFFFF !important;
 }
 
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active{
 	color:#FFFFFF !important;
-	background: url("ohanah_css/custom-theme/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
+	background: url("../css/images/ui-bg_inset-soft_75_909da7_1x100.png") repeat-x scroll 50% 50% #909DA7 !important;
 }
 
 .ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight{
@@ -1187,7 +1198,7 @@ table.toolbar{
 }
 
 .ui-state-hover, .ui-icon, .ui-state-focus, .ui-icon{
-	background-image:url("ohanah_css/custom-theme/images/ui-icons_ffffff_256x240.png") !important;
+	background-image:url("../css/images/ui-icons_ffffff_256x240.png") !important;
 }
 
 .ui-datepicker-prev.ui-state-hover, .ui-datepicker-next.ui-state-hover {
@@ -1402,4 +1413,12 @@ td.divider {
 td.start .validation-advice {	
 	position: absolute;
 	margin-top: 40px;
+}
+
+.center {
+	text-align:center;
+}
+
+#menu {
+	z-index: 999999!important;
 }

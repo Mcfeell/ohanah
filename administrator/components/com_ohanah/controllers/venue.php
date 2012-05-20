@@ -2,7 +2,7 @@
 
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -43,11 +43,13 @@ class ComOhanahControllerVenue extends ComOhanahControllerCommon
 	
 	protected function _actionEdit(KCommandContext $context) 
 	{ 	
-		$context->data = $this->reverseGeocode($context->data);
-		$this->_ifDisablingDisableAllEventsInThisVenue(KRequest::get('get.id', 'int'), $context->data);
-		
-		$venue = $this->getService('com://admin/ohanah.model.venues')->id(KRequest::get('get.id', 'int'))->getItem();
+		if (KRequest::get('get.view', 'string') == 'venue') {
+			$context->data = $this->reverseGeocode($context->data);
+		}
+
 		$row = parent::_actionEdit($context);
+		$this->_ifDisablingDisableAllEventsInThisVenue($row->id, $context->data);
+
 		$data = reset($row->getData());
 
 		if (is_numeric($data))
@@ -60,23 +62,6 @@ class ComOhanahControllerVenue extends ComOhanahControllerCommon
 	}
 	
 	public function unlockRow(KCommandContext $context) {}
-		
-	protected function _saveFile($file)
-	{
-		if (JFile::exists($file['tmp_name']))
-		{
-			$fileSafeName = JFile::makeSafe($file['name']);
-			$randomNumber = rand();
-			if (JFile::upload($file['tmp_name'], JPATH_ROOT.DS.'media/com_ohanah/venues_images'.DS.$randomNumber.'-'.$fileSafeName)) {
-				$fileName = $randomNumber.'-'.$fileSafeName;
-				$this->_createThumb('venues', $fileName);
-				return $fileName;
-			}
-				
-			else 
-				JError::raiseWarning(0, 'Could not upload file');			
-		}	
-	}
 		
 	protected function _actionAdd(KCommandContext $context) 
 	{

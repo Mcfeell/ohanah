@@ -1,7 +1,7 @@
 <? (defined('_JEXEC') && defined('KOOWA')) or die('Restricted access'); ?>
 
 <style src="media://com_ohanah/v2/ohanah_css/jquery.cleditor.css" />
-<style src="media://com_ohanah/v2/ohanah_css/custom-theme/jquery-ui-1.8.14.custom.css" />
+<style src="media://com_ohanah/css/jquery-ui.css" />
 
 <?=@helper('behavior.mootools') ?>
 <?=@helper('behavior.validator') ?>
@@ -146,26 +146,30 @@ if ($id = KRequest::get('get.id', 'int')) {
 			<div id="adminRight" class="bottom">
 				<div class="panel">
 					<div class="panelContent">
-						<table style="width:20%">
-							<tr>
-								<td>
-									<span class="fieldTitle"><?=@text('OHANAH_REGISTRATION_NUMBER_OF_TICKETS');?></span><br/>
-									<div class="dropdownWrapper">
-										<div class="dropdown size2">
-											
-											<select name="number_of_tickets" id="number_of_tickets">
-												<option value="1" <? if ($registration->number_of_tickets==1) echo 'selected';?>>1</option>
-												<option value="2" <? if ($registration->number_of_tickets==2) echo 'selected';?>>2</option>
-												<option value="3" <? if ($registration->number_of_tickets==3) echo 'selected';?>>3</option>
-												<option value="4" <? if ($registration->number_of_tickets==4) echo 'selected';?>>4</option>
-												<option value="5" <? if ($registration->number_of_tickets==5) echo 'selected';?>>5</option>
-											</select>
+						<? if ($event->allow_only_one_ticket != 1) : ?>
+							<table style="width:20%">
+								<tr>
+									<td>
+										<span class="fieldTitle"><?=@text('OHANAH_REGISTRATION_NUMBER_OF_TICKETS');?></span><br/>
+										<div class="dropdownWrapper">
+											<div class="dropdown size2">
+												
+												<select name="number_of_tickets" id="number_of_tickets">
+													<option value="1" <? if ($registration->number_of_tickets==1) echo 'selected';?>>1</option>
+													<option value="2" <? if ($registration->number_of_tickets==2) echo 'selected';?>>2</option>
+													<option value="3" <? if ($registration->number_of_tickets==3) echo 'selected';?>>3</option>
+													<option value="4" <? if ($registration->number_of_tickets==4) echo 'selected';?>>4</option>
+													<option value="5" <? if ($registration->number_of_tickets==5) echo 'selected';?>>5</option>
+												</select>
+											</div>
 										</div>
-									</div>
-								</td>
+									</td>
 
-							</tr>
-						</table>
+								</tr>
+							</table>
+						<? else : ?>
+							<input type="hidden" name="number_of_tickets" value="1" />
+						<? endif ?>
 						<table style="width:20%">
 							<tr>
 								<td>

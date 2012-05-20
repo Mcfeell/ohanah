@@ -1,7 +1,7 @@
 <? (defined('_JEXEC') && defined('KOOWA')) or die('Restricted access'); ?>
 
 <style src="media://com_ohanah/v2/ohanah_css/jquery.cleditor.css" />
-<style src="media://com_ohanah/v2/ohanah_css/custom-theme/jquery-ui-1.8.14.custom.css" />
+<style src="media://com_ohanah/css/jquery-ui.css" />
 
 <?=@helper('behavior.mootools'); ?>
 <?=@helper('behavior.validator') ?>
@@ -10,11 +10,62 @@
 
 <?= @template('com://admin/ohanah.view.common.images', array('item' => $event, 'name' => 'event')); ?>
 
+<?
+$joomlaVersion = JVersion::isCompatible('1.6.0') ? '1.6' : '1.5';
+
+if ($joomlaVersion == '1.5') { 
+	$params = JComponentHelper::getParams('com_ohanah')->toObject();
+} else {
+   	$params = (json_decode(JComponentHelper::getComponent('com_ohanah')->params));
+}
+?>
+
 <script>
+
 	function check_times() {
-		if ($jq('#end_date').val() == $jq('#date').val()) { 					
-			if ($jq('select[name="end_time"]').val() < $jq('select[name="start_time"]').val()) {
-				$jq('select[name="end_time"]').val($jq('select[name="start_time"]').val());	
+		if ($jq('#end_date').val() == $jq('#date').val()) { 	
+			var hS = $jq('select[name="start_time_h"]');
+			var mS = $jq('select[name="start_time_m"]');
+			var ampmS = $jq('select[name="start_time_ampm"]'); // return empty array if there is no such element
+			var hE = $jq('select[name="end_time_h"]');
+			var mE = $jq('select[name="end_time_m"]');
+			var ampmE = $jq('select[name="end_time_ampm"]'); // return empty array if there is no such element
+		
+			if (ampmS.length) { // ampm returned something, so actually there is AMPM selector and we should do the math
+				if (ampmS.val() == ampmE.val()) { // if start and end are in the same part of the day, we do the math
+					
+					// problem is that 12 means 00, so we treat this case special
+					// f end is 12, then it's OK just if start is 12, otherwise it's bad
+					if (hE.val() == "12") {
+						hE.val(hS.val()); // if start is 12 too, nothing will change, otherwise end = start
+					} else { // now we know end is not 12, so we do the check
+						if (hS.val() != "12" & hS.val() > hE.val()) { // if it's 12, it's OK, it's like 00, everything is fine
+							hE.val(hS.val());	
+						}
+					}
+					
+					// if hours are the same, we check minutes
+					if (hS.val() == hE.val()) {
+						if (mS.val() > mE.val()) {
+							mE.val(mS.val());
+						}
+					}
+				}
+				// if start is AM and end is PM, then it's fine, nothitg to worry about
+				// else, it's start PM and end AM, that's wrong, switch end to PM also
+				if (ampmS.val() == "PM" & ampmE.val() == "AM") {
+					ampmE.val("PM");
+				}
+
+			} else { // 24 hour format, yey... 
+				if (hS.val() > hE.val()) {
+					hE.val(hS.val());
+				}
+				if (hS.val() == hE.val()) {
+					if (mS.val() > mE.val()) {
+						mE.val(mS.val());
+					}
+				}
 			}
 		}
 	}
@@ -146,32 +197,70 @@
 		});
 		
 		<? if (!$event->end_time_enabled) : ?>
-			$jq('#end_timer').css('display', 'none');
+			$jq('#end_timer_h').css('display', 'none');
+			$jq('#end_timer_m').css('display', 'none');
+			$jq('#end_timer_ampm').css('display', 'none');
 			$jq('#end_date').css('display', 'none');
 		<? endif ?>
 
 		$jq('input[name="end_time_enabled"]').change(function(){
 			if($jq(this).is(":checked")) {
+				// visual
 				$jq('#end_date').css('display', 'inline');
-				$jq('#end_timer').css('display', 'inline');
-				var currentStartIndex = $jq('#start_timer select').prop('selectedIndex');
-				var newEndIndex = (currentStartIndex + 6);
-				if (newEndIndex > 47) {
-					newEndIndex = newEndIndex - 48;
+				$jq('#end_timer_h').css('display', 'inline');
+				$jq('#end_timer_m').css('display', 'inline');
+				$jq('#end_timer_ampm').css('display', 'inline');
 
-
-				  	var date2 = $jq('#date').datepicker('getDate', '+1d'); 
-				  	date2.setDate(date2.getDate()+1); 
-				  	$jq('#end_date').datepicker('setDate', date2);
+	
+				var start_hours = parseInt($jq('select[name="start_time_h"]').val(), 10);
+				var end_hours = start_hours + 6;
+				var inc_date = false;
+				if ($jq('select[name="end_time_ampm"]').length) { // we are in AM/PM mode
+					// 12 means 00 so + 6 will be OK, just adjust it
+					if (start_hours == 12) {
+						end_hours = end_hours - 12;
+					}
+					// if we get over 11, we must check if we are in AM or PM
+					if (end_hours > 11) {
+					
+						if ($jq('select[name="start_time_ampm"]').val() == "AM") {
+							// it's AM and +6 led us into PM
+							$jq('select[name="end_time_ampm"]').val("PM");
+						} else { // it's PM
+							$jq('select[name="end_time_ampm"]').val("AM");
+							inc_date = true;
+						}
+						if (end_hours > 12) { // if it's 12, leave it alone, it's OK
+							end_hours = end_hours - 12;
+						}
+					}
+				} else { // 24h mode
+					if (end_hours > 23) {
+						console.log(end_hours, "");
+						
+						end_hours = end_hours - 24;
+						inc_date = true;
+					}
+				}
+				// now to set up end_timer_h to it's proper value and to increase date if needed
+				if (inc_date) {
+					var date2 = $jq('#date').datepicker('getDate', '+1d'); 
+			  	date2.setDate(date2.getDate()+1); 
+			  	$jq('#end_date').datepicker('setDate', date2);
 				} else {
 				  	var date2 = $jq('#date').datepicker('getDate'); 
 				  	$jq('#end_date').datepicker('setDate', date2);
-
 				}
+				
+				if (end_hours < 10) end_hours = "0" + end_hours;
 
-				$jq('#end_timer select').prop('selectedIndex', newEndIndex);
-			} else {
-				$jq('#end_timer').css('display', 'none');
+				$jq('select[name="end_time_h"]').val(end_hours);
+
+
+			} else { // uncheck
+				$jq('#end_timer_h').css('display', 'none');
+				$jq('#end_timer_m').css('display', 'none');
+				$jq('#end_timer_ampm').css('display', 'none');
 				$jq('#end_date').css('display', 'none');
 			}
 		});
@@ -191,12 +280,10 @@
 			check_times();
 		});
 
-		$jq('select[name="start_time"]').change(function() {
+		$jq('select[name="start_time_h"], select[name="start_time_m"], select[name="start_time_ampm"], select[name="end_time_h"], select[name="end_time_m"], select[name="end_time_ampm"]').change(function() {
 			check_times();
 		});
-		$jq('select[name="end_time"]').change(function() {
-			check_times();
-		});
+		
 	});
 </script>
 
@@ -326,7 +413,8 @@
 						<table>
 							<tr>
 								<td colspan="2"><span class="fieldTitle"><?=@text('OHANAH_DESCRIPTION')?></span><br/>
-									<? if (JComponentHelper::getParams('com_ohanah')->get('useStandardJoomlaEditor')) : ?>			
+									<? if (isset($params->useStandardJoomlaEditor)) $useStandardJoomlaEditor = $params->useStandardJoomlaEditor; else $useStandardJoomlaEditor = false; ?>
+									<? if ($useStandardJoomlaEditor) : ?>
 										<?= @editor( array('height' => '291', 'cols' => '100', 'rows' => '20')); ?>
 									<? else : ?>
 										<textarea class="description" name="description" id="description_textarea"><?=$event->description?></textarea>
@@ -353,21 +441,71 @@
 									<span class="fieldTitle"><?=@text('OHANAH_START')?></span><br/>
 									<? if ($event->date) $day = new KDate(new KConfig(array('date' => $event->date))); else $day = new KDate()?>
 									<input name='date' type='text' value='<?=$day->getDate('%Y-%m-%d')?>' class='text formDate calendar cal1 required' id="date" style="float:left" />
-									<div class="dropdownWrapper" id="start_timer">
-										<div class="dropdown size2" style="float:left">
-											<?=@helper('com://admin/ohanah.template.helper.listbox.time', array('name' => 'start_time', 'selected' => substr($event->start_time, 0, 5))) ?>
+									
+									<? $ampm = "";
+										if (JComponentHelper::getParams('com_ohanah')->get('timeFormat') == '1') $ampm = "ampm";
+									?>
+
+									<? if ($ampm) : ?>
+										<div class="dropdownWrapper" id="start_timer_ampm">
+											<div class="dropdown size3 time <?=$ampm?>" style="float:left;">
+												<?=@helper('com://admin/ohanah.template.helper.listbox.timeAMPM', array('name' => 'start_time_ampm', 'selected' => 
+															intval(substr($event->start_time, 0, 2))+1 <= 12 ? "AM" : "PM")) ?>
+											</div>	
+										</div>
+									<? endif; ?>
+
+									<div class="dropdownWrapper" id="start_timer_m">
+										<div class="dropdown size3 time <?=$ampm?>"  style="float:left; <? if ($ampm) echo "margin-right: 10px;";?>">
+											<?=@helper('com://admin/ohanah.template.helper.listbox.timeM', array('name' => 'start_time_m', 'selected' => substr($event->start_time, 3, 2))) ?>
 										</div>	
 									</div>
+
+									<div class="dropdownWrapper" id="start_timer_h">
+										<div class="dropdown size3 time <?=$ampm?>" style="float:left; margin-right: 10px;">
+
+											<?
+												$hour = @helper('com://admin/ohanah.template.helper.time.getHour', array('time' => $event->start_time)); 
+											?>
+											<?=@helper('com://admin/ohanah.template.helper.listbox.timeH', array('name' => 'start_time_h', 'selected' => $hour)) ?>
+										</div>	
+									</div>
+
+
+
+
 								</td>
 								<td style="width:340px">
 									<span class="fieldTitle"><input type="checkbox" name="end_time_enabled" value="0" <? if ($event->end_time_enabled == '1') echo 'checked' ?> /> <?=@text('OHANAH_ADD_END_TIME')?></span><br/>
 									<? if ($event->end_date) $day = new KDate(new KConfig(array('date' => $event->end_date))); else $day = new KDate()?>								
 									<input name='end_date' type='text' value='<?=$day->getDate('%Y-%m-%d')?>' class='text formDate calendar cal2' id="end_date" />
-									<div class="dropdownWrapper" id="end_timer">
-										<div class="dropdown size2" style="float:right">
-											<?=@helper('com://admin/ohanah.template.helper.listbox.time', array('name' => 'end_time', 'selected' => substr($event->end_time, 0, 5))) ?>
+
+									<? $ampm = "";
+										if (JComponentHelper::getParams('com_ohanah')->get('timeFormat') == '1') $ampm = "ampm";
+									?>
+
+									<? if ($ampm) : ?>
+										<div class="dropdownWrapper" id="end_timer_ampm">
+											<div class="dropdown size3 time <?=$ampm?>" style="float:left;">
+												<?=@helper('com://admin/ohanah.template.helper.listbox.timeAMPM', array('name' => 'end_time_ampm', 'selected' => 
+															intval(substr($event->end_time, 0, 2))+1 <= 12 ? "AM" : "PM")) ?>
+											</div>	
+										</div>
+									<? endif; ?>
+
+									<div class="dropdownWrapper" id="end_timer_m">
+										<div class="dropdown size3 time <?=$ampm?>"  style="float:left; <? if ($ampm) echo "margin-right: 10px;";?>">
+											<?=@helper('com://admin/ohanah.template.helper.listbox.timeM', array('name' => 'end_time_m', 'selected' => substr($event->end_time, 3, 2))) ?>
 										</div>	
 									</div>
+
+									<div class="dropdownWrapper" id="end_timer_h">
+										<div class="dropdown size3 time <?=$ampm?>" style="float:left; margin-right: 10px;">
+											<? $hour = @helper('com://admin/ohanah.template.helper.time.getHour', array('time' => $event->end_time)); ?>
+											<?=@helper('com://admin/ohanah.template.helper.listbox.timeH', array('name' => 'end_time_h', 'selected' => $hour)) ?>
+										</div>	
+									</div>
+
 								</td>
 							</tr>
 						</table>
@@ -481,38 +619,11 @@
 								<td>
 									<span class="fieldTitle"><?=@text('OHANAH_COST_PER_TICKET')?></span><br/>
 									<input type="text" class="text seventy" name="ticket_cost" value="<?=$event->ticket_cost?>" />
-
 									<div class="dropdownWrapper">
-										<div class="dropdown size3">
-											<? $opts = array();
-											$opt = new KObject(); $opt->text = "USD"; $opt->value="USD"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "EUR"; $opt->value="EUR"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "GBP"; $opt->value="GBP"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "CHF"; $opt->value="CHF"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "CAD"; $opt->value="CAD"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "JPY"; $opt->value="JPY"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "AUD"; $opt->value="AUD"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "BRL"; $opt->value="BRL"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "CZK"; $opt->value="CZK"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "DKK"; $opt->value="DKK"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "HKD"; $opt->value="HKD"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "HUF"; $opt->value="HUF"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "ILS"; $opt->value="ILS"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "JPY"; $opt->value="JPY"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "MYR"; $opt->value="MYR"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "MXN"; $opt->value="MXN"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "NOK"; $opt->value="NOK"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "NZD"; $opt->value="NZD"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "PHP"; $opt->value="PHP"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "PLN"; $opt->value="PLN"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "SGD"; $opt->value="SGD"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "SEK"; $opt->value="SEK"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "TWD"; $opt->value="TWD"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "THB"; $opt->value="THB"; $opts[] = $opt;
-											$opt = new KObject(); $opt->text = "TRY"; $opt->value="TRY"; $opts[] = $opt;
-											?>
-											<? if ($event->payment_currency) $default = $event->payment_currency; else $default = JComponentHelper::getParams('com_ohanah')->get('payment_currency'); ?>
-											<?= @helper('select.optionlist', array('name' => 'payment_currency',  'options' => $opts, 'selected' => $default)); ?><br />
+										<div class="dropdown size3">											
+											<? if ($event->payment_currency) $default = $event->payment_currency; else $default = $params->payment_currency; ?>
+											<?=@helper('com://admin/ohanah.template.helper.listbox.currency', array('selected' => $default)) ?>
+											<br />
 										</div>
 									</div>
 								</td>
@@ -524,19 +635,13 @@
 										</div>
 									</div>
 									<input type="text" class="text" style="width:154px;" id="attendees_limit" name="attendees_limit" value="<?=$event->attendees_limit?>" />
+
+									<br />
+									<? if (isset(@$event->allow_only_one_ticket)) $default = $event->allow_only_one_ticket; else { if (isset($params->allow_only_one_ticket)) $default = $params->allow_only_one_ticket; else $default = '0'; } ?>
+									<span class="fieldTitle"><input type="checkbox" name="allow_only_one_ticket" value="0" <? if ($default == 1) echo 'checked' ?> /> <?=@text('Allow only 1 ticket per registration')?></span><br/>
+
 								</td>
 							</tr>
-
-							<?
-					    	$joomlaVersion = JVersion::isCompatible('1.6.0') ? '1.6' : '1.5';
-
-					        if ($joomlaVersion == '1.5') { 
-					        	$params = JComponentHelper::getParams('com_ohanah')->toObject();
-					        } else {
-					           	$params = (json_decode(JComponentHelper::getComponent('com_ohanah')->params));
-					        }
-					        ?>
-
 							<tr>
 								<td>
 									<span class="fieldTitle"><?=@text('OHANAH_REGISTRATION_SYSTEM')?></span><br/>

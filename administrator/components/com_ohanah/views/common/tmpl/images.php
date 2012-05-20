@@ -32,7 +32,7 @@
 	<? if ($item->id) : ?>
 		<? $images = @service('com://admin/ohanah.model.attachments')->set('target_type', $name)->set('target_id', $item->id)->getList() ?>
 		<? foreach ($images as $image) : ?>
-			<? if ($image->name != $item->picture) : ?>
+			<? if ($name != 'event' || $image->name != $item->picture) : ?>
 				photos.push('<?=$image->name?>');
 			<? endif ?>
 		<? endforeach ?>
@@ -59,7 +59,7 @@
 
 	function createPicture() {
 		if (eventPicture=="") {
-			jQuery("#eventPicture").html('<table><tr><td><input id="selectPicture" type="button" class="button" value="<?=@text('OHANAH_SELECT_NEW')?>"><label class="cabinet"><input type="file" class="file" name="pictureUpload" id="pictureUpload" /></label></td></tr></table>');
+			jQuery("#eventPicture").html('<table><tr><td><input id="selectPicture" type="button" class="button" value="<?=addslashes(@text('OHANAH_SELECT_NEW'))?>"><label class="cabinet"><input type="file" class="file" name="pictureUpload" id="pictureUpload" /></label></td></tr></table>');
 		} else {
 			jQuery('#picture').val(eventPicture);
 			jQuery("#eventPicture").html('<table><tr><td><div class="photoOver section"><div class="photo"><div style="background:url(\'http://<?=$_SERVER['HTTP_HOST'].KRequest::root()?>/media/com_ohanah/attachments/'+eventPicture+'\') center center no-repeat;"><img width="249" height="242" src="http://<?=$_SERVER['HTTP_HOST'].KRequest::root()?>/media/com_ohanah/v2/ohanah_images/blank.gif" class="picBorder" /><div class="buttonOverlay"><ul class="photoButtons"><li><a href="javascript:removePicture(\''+eventPicture+'\');" class="deletePhoto">Delete</a></li><li><a href="http://<?=$_SERVER['HTTP_HOST'].KRequest::root()?>/media/com_ohanah/attachments/'+eventPicture+'" target="_blank" class="zoomPhoto">Zoom</a></li></ul></div></div></div></div></td><td><input id="selectPicture" type="button" class="button" value="<?=@text('OHANAH_SELECT_NEW')?>"><label class="cabinet"><input type="file" class="file" name="pictureUpload" id="pictureUpload" /></label></td></tr></table>');
@@ -70,7 +70,7 @@
 
 	function createPhotos() {
 		jQuery( "#eventPhotos" ).html('');	
-		eventPhotos = '<table><tr>';
+		var eventPhotos = '<table><tr>';
 		var i = 0;
 		jQuery.each(photos, function(key, value) { 
 			eventPhotos +='<td>';
@@ -85,7 +85,7 @@
 		if(photos==""){
 			eventPhotos += '';
 		}
-		eventPhotos +='<td><input type="button" class="button" value="<?=@text('OHANAH_ADD_PHOTOS');?>"><label class="cabinet"><input type="file" class="file" name="photoUpload" id="photoUpload" /></label></td>'
+		eventPhotos +='<td><input type="button" class="button" value="<?=addslashes(@text('OHANAH_ADD_PHOTOS'));?>"><label class="cabinet"><input type="file" class="file" name="photoUpload" id="photoUpload" /></label></td>'
 		if(((photos.length)%3)==1) {
 			eventPhotos +='<td><img width="104" height="106" src="http://<?=$_SERVER['HTTP_HOST'].KRequest::root()?>/media/com_ohanah/v2/ohanah_images/blank.gif" /></td>';
 		}

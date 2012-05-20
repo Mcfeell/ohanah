@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		mod_sidebar
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -19,12 +19,12 @@ class ModOhanaheventmapHtml extends ModDefaultHtml
     
 	public function display()
 	{
-		$id = KRequest::get('get.id', 'int');
+		$id = null;
+		if (KRequest::get('get.view', 'string') == 'event') $id = KRequest::get('get.id', 'int');
+		if (KRequest::get('get.view', 'string') == 'registration') $id = KRequest::get('get.ohanah_event_id', 'int');
 		if (!$id) $id = JFactory::getApplication()->getPageParameters()->get('id');
 		
-		if ((KRequest::get('get.option', 'string') == 'com_ohanah') &&
-			(KRequest::get('get.view', 'string') == 'event') &&
-			$id)
+		if ((KRequest::get('get.option', 'string') == 'com_ohanah') && $id)
 		{
 		
 			$event = $this->getService('com://admin/ohanah.model.events')

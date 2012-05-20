@@ -2,7 +2,7 @@
 
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -64,6 +64,7 @@ class ComOhanahControllerConfig extends ComDefaultControllerResource
 		$post['params']['showLinkBack']= KRequest::get('post.showLinkBack', 'int');
 		$post['params']['usePagination']= KRequest::get('post.usePagination', 'int');
 		$post['params']['eventsPerPage']= KRequest::get('post.eventsPerPage', 'int');
+		$post['params']['showFeedLink']= KRequest::get('post.showFeedLink', 'int');
 
 		$post['params']['subject_mail_new_event']= KRequest::get('post.subject_mail_new_event', 'string');
 		$post['params']['text_mail_new_event']= KRequest::get('post.text_mail_new_event', 'raw');
@@ -134,9 +135,15 @@ class ComOhanahControllerConfig extends ComDefaultControllerResource
 
 		$post['params']['destination_email']= KRequest::get('post.destination_email', 'raw');
 		$post['params']['buttons_style']= KRequest::get('post.buttons_style', 'raw');
+		$post['params']['useFacebookComments']= KRequest::get('post.useFacebookComments', 'int');
+		$post['params']['redirect_after_add_event']= KRequest::get('post.redirect_after_add_event', 'raw');
+		$post['params']['localEnvironment']= KRequest::get('post.localEnvironment', 'int');
+
 
 		// Checkboxes
 
+		if (KRequest::get('post.allow_only_one_ticket', 'string') != null) $allow_only_one_ticket = 1; else $allow_only_one_ticket = 0;
+		$post['params']['allow_only_one_ticket'] = $allow_only_one_ticket;
 
 		if (KRequest::get('post.disableModuleInjector', 'string') != null) $disableModuleInjector = 1; else $disableModuleInjector = 0;
 		$post['params']['disableModuleInjector'] = $disableModuleInjector;
@@ -171,6 +178,123 @@ class ComOhanahControllerConfig extends ComDefaultControllerResource
 		
 		if (KRequest::get('post.useStandardJoomlaEditor', 'string') != null) $useStandardJoomlaEditor = 1; else $useStandardJoomlaEditor = 0;
 		$post['params']['useStandardJoomlaEditor'] = $useStandardJoomlaEditor;
+
+
+		if (KRequest::get('post.showLinkToCategoryInList', 'string') != null) $showLinkToCategoryInList = 1; else $showLinkToCategoryInList = 0;
+		$post['params']['showLinkToCategoryInList'] = $showLinkToCategoryInList;
+		if (KRequest::get('post.showLinkToCategoryInSingle', 'string') != null) $showLinkToCategoryInSingle = 1; else $showLinkToCategoryInSingle = 0;
+		$post['params']['showLinkToCategoryInSingle'] = $showLinkToCategoryInSingle;
+		if (KRequest::get('post.showLinkToCategoryInModule', 'string') != null) $showLinkToCategoryInModule = 1; else $showLinkToCategoryInModule = 0;
+		$post['params']['showLinkToCategoryInModule'] = $showLinkToCategoryInModule;
+		if (KRequest::get('post.showLinkToVenueInList', 'string') != null) $showLinkToVenueInList = 1; else $showLinkToVenueInList = 0;
+		$post['params']['showLinkToVenueInList'] = $showLinkToVenueInList;
+		if (KRequest::get('post.showLinkToVenueInSingle', 'string') != null) $showLinkToVenueInSingle = 1; else $showLinkToVenueInSingle = 0;
+		$post['params']['showLinkToVenueInSingle'] = $showLinkToVenueInSingle;
+		if (KRequest::get('post.showLinkToVenueInModule', 'string') != null) $showLinkToVenueInModule = 1; else $showLinkToVenueInModule = 0;
+		$post['params']['showLinkToVenueInModule'] = $showLinkToVenueInModule;
+		if (KRequest::get('post.showLinkToRecurringSetInList', 'string') != null) $showLinkToRecurringSetInList = 1; else $showLinkToRecurringSetInList = 0;
+		$post['params']['showLinkToRecurringSetInList'] = $showLinkToRecurringSetInList;
+		if (KRequest::get('post.showLinkToRecurringSetInSingle', 'string') != null) $showLinkToRecurringSetInSingle = 1; else $showLinkToRecurringSetInSingle = 0;
+		$post['params']['showLinkToRecurringSetInSingle'] = $showLinkToRecurringSetInSingle;
+		if (KRequest::get('post.showLinkToRecurringSetInModule', 'string') != null) $showLinkToRecurringSetInModule = 1; else $showLinkToRecurringSetInModule = 0;
+		$post['params']['showLinkToRecurringSetInModule'] = $showLinkToRecurringSetInModule;
+		if (KRequest::get('post.showLinkToSaveToCalInList', 'string') != null) $showLinkToSaveToCalInList = 1; else $showLinkToSaveToCalInList = 0;
+		$post['params']['showLinkToSaveToCalInList'] = $showLinkToSaveToCalInList;
+		if (KRequest::get('post.showLinkToSaveToCalInSingle', 'string') != null) $showLinkToSaveToCalInSingle = 1; else $showLinkToSaveToCalInSingle = 0;
+		$post['params']['showLinkToSaveToCalInSingle'] = $showLinkToSaveToCalInSingle;
+		if (KRequest::get('post.showLinkToSaveToCalInModule', 'string') != null) $showLinkToSaveToCalInModule = 1; else $showLinkToSaveToCalInModule = 0;
+		$post['params']['showLinkToSaveToCalInModule'] = $showLinkToSaveToCalInModule;
+		if (KRequest::get('post.showCostInfoInList', 'string') != null) $showCostInfoInList = 1; else $showCostInfoInList = 0;
+		$post['params']['showCostInfoInList'] = $showCostInfoInList;
+		if (KRequest::get('post.showCostInfoInSingle', 'string') != null) $showCostInfoInSingle = 1; else $showCostInfoInSingle = 0;
+		$post['params']['showCostInfoInSingle'] = $showCostInfoInSingle;
+		if (KRequest::get('post.showCostInfoInModule', 'string') != null) $showCostInfoInModule = 1; else $showCostInfoInModule = 0;
+		$post['params']['showCostInfoInModule'] = $showCostInfoInModule;
+		if (KRequest::get('post.showPlacesLeftInList', 'string') != null) $showPlacesLeftInList = 1; else $showPlacesLeftInList = 0;
+		$post['params']['showPlacesLeftInList'] = $showPlacesLeftInList;
+		if (KRequest::get('post.showPlacesLeftInSingle', 'string') != null) $showPlacesLeftInSingle = 1; else $showPlacesLeftInSingle = 0;
+		$post['params']['showPlacesLeftInSingle'] = $showPlacesLeftInSingle;
+		if (KRequest::get('post.showPlacesLeftInModule', 'string') != null) $showPlacesLeftInModule = 1; else $showPlacesLeftInModule = 0;
+		$post['params']['showPlacesLeftInModule'] = $showPlacesLeftInModule;
+		if (KRequest::get('post.showEventPictureInList', 'string') != null) $showEventPictureInList = 1; else $showEventPictureInList = 0;
+		$post['params']['showEventPictureInList'] = $showEventPictureInList;
+		if (KRequest::get('post.showEventPictureInSingle', 'string') != null) $showEventPictureInSingle = 1; else $showEventPictureInSingle = 0;
+		$post['params']['showEventPictureInSingle'] = $showEventPictureInSingle;
+		if (KRequest::get('post.showEventPictureInModule', 'string') != null) $showEventPictureInModule = 1; else $showEventPictureInModule = 0;
+		$post['params']['showEventPictureInModule'] = $showEventPictureInModule;
+		if (KRequest::get('post.showEventFullDescriptionInList', 'string') != null) $showEventFullDescriptionInList = 1; else $showEventFullDescriptionInList = 0;
+		$post['params']['showEventFullDescriptionInList'] = $showEventFullDescriptionInList;
+		if (KRequest::get('post.showEventFullDescriptionInSingle', 'string') != null) $showEventFullDescriptionInSingle = 1; else $showEventFullDescriptionInSingle = 0;
+		$post['params']['showEventFullDescriptionInSingle'] = $showEventFullDescriptionInSingle;
+		if (KRequest::get('post.showEventFullDescriptionInModule', 'string') != null) $showEventFullDescriptionInModule = 1; else $showEventFullDescriptionInModule = 0;
+		$post['params']['showEventFullDescriptionInModule'] = $showEventFullDescriptionInModule;
+		if (KRequest::get('post.showEventDescriptionSnippetInList', 'string') != null) $showEventDescriptionSnippetInList = 1; else $showEventDescriptionSnippetInList = 0;
+		$post['params']['showEventDescriptionSnippetInList'] = $showEventDescriptionSnippetInList;
+		if (KRequest::get('post.showEventDescriptionSnippetInSingle', 'string') != null) $showEventDescriptionSnippetInSingle = 1; else $showEventDescriptionSnippetInSingle = 0;
+		$post['params']['showEventDescriptionSnippetInSingle'] = $showEventDescriptionSnippetInSingle;
+		if (KRequest::get('post.showEventDescriptionSnippetInModule', 'string') != null) $showEventDescriptionSnippetInModule = 1; else $showEventDescriptionSnippetInModule = 0;
+		$post['params']['showEventDescriptionSnippetInModule'] = $showEventDescriptionSnippetInModule;
+		if (KRequest::get('post.showEventDateInList', 'string') != null) $showEventDateInList = 1; else $showEventDateInList = 0;
+		$post['params']['showEventDateInList'] = $showEventDateInList;
+       	if (KRequest::get('post.showEventDateInSingle', 'string') != null) $showEventDateInSingle = 1; else $showEventDateInSingle = 0;
+		$post['params']['showEventDateInSingle'] = $showEventDateInSingle;
+		if (KRequest::get('post.showEventDateInModule', 'string') != null) $showEventDateInModule = 1; else $showEventDateInModule = 0;
+		$post['params']['showEventDateInModule'] = $showEventDateInModule;
+		if (KRequest::get('post.showEventAddressInList', 'string') != null) $showEventAddressInList = 1; else $showEventAddressInList = 0;
+		$post['params']['showEventAddressInList'] = $showEventAddressInList;
+		if (KRequest::get('post.showEventAddressInSingle', 'string') != null) $showEventAddressInSingle = 1; else $showEventAddressInSingle = 0;
+		$post['params']['showEventAddressInSingle'] = $showEventAddressInSingle;
+		if (KRequest::get('post.showEventAddressInModule', 'string') != null) $showEventAddressInModule = 1; else $showEventAddressInModule = 0;
+		$post['params']['showEventAddressInModule'] = $showEventAddressInModule;
+		if (KRequest::get('post.showBigDateBadgeInList', 'string') != null) $showBigDateBadgeInList = 1; else $showBigDateBadgeInList = 0;
+		$post['params']['showBigDateBadgeInList'] = $showBigDateBadgeInList;
+		if (KRequest::get('post.showBigDateBadgeInSingle', 'string') != null) $showBigDateBadgeInSingle = 1; else $showBigDateBadgeInSingle = 0;
+		$post['params']['showBigDateBadgeInSingle'] = $showBigDateBadgeInSingle;
+		if (KRequest::get('post.showBigDateBadgeInModule', 'string') != null) $showBigDateBadgeInModule = 1; else $showBigDateBadgeInModule = 0;
+		$post['params']['showBigDateBadgeInModule'] = $showBigDateBadgeInModule;
+
+		if (KRequest::get('post.showReadMoreInList', 'string') != null) $showReadMoreInList = 1; else $showReadMoreInList = 0;
+		$post['params']['showReadMoreInList'] = $showReadMoreInList;
+		if (KRequest::get('post.showReadMoreInSingle', 'string') != null) $showReadMoreInSingle = 1; else $showReadMoreInSingle = 0;
+		$post['params']['showReadMoreInSingle'] = $showReadMoreInSingle;
+		if (KRequest::get('post.showReadMoreInModule', 'string') != null) $showReadMoreInModule = 1; else $showReadMoreInModule = 0;
+		$post['params']['showReadMoreInModule'] = $showReadMoreInModule;
+		if (KRequest::get('post.showTimeInList', 'string') != null) $showTimeInList = 1; else $showTimeInList = 0;
+		$post['params']['showTimeInList'] = $showTimeInList;
+		if (KRequest::get('post.showTimeInSingle', 'string') != null) $showTimeInSingle = 1; else $showTimeInSingle = 0;
+		$post['params']['showTimeInSingle'] = $showTimeInSingle;
+		if (KRequest::get('post.showTimeInModule', 'string') != null) $showTimeInModule = 1; else $showTimeInModule = 0;
+		$post['params']['showTimeInModule'] = $showTimeInModule;
+
+		if (KRequest::get('post.showLinkToCategoryInRegistration', 'string') != null) $showLinkToCategoryInRegistration = 1; else $showLinkToCategoryInRegistration = 0;
+		$post['params']['showLinkToCategoryInRegistration'] = $showLinkToCategoryInRegistration;
+		if (KRequest::get('post.showLinkToVenueInRegistration', 'string') != null) $showLinkToVenueInRegistration = 1; else $showLinkToVenueInRegistration = 0;
+		$post['params']['showLinkToVenueInRegistration'] = $showLinkToVenueInRegistration;
+		if (KRequest::get('post.showLinkToRecurringSetInRegistration', 'string') != null) $showLinkToRecurringSetInRegistration = 1; else $showLinkToRecurringSetInRegistration = 0;
+		$post['params']['showLinkToRecurringSetInRegistration'] = $showLinkToRecurringSetInRegistration;
+		if (KRequest::get('post.showLinkToSaveToCalInRegistration', 'string') != null) $showLinkToSaveToCalInRegistration = 1; else $showLinkToSaveToCalInRegistration = 0;
+		$post['params']['showLinkToSaveToCalInRegistration'] = $showLinkToSaveToCalInRegistration;
+		if (KRequest::get('post.showCostInfoInRegistration', 'string') != null) $showCostInfoInRegistration = 1; else $showCostInfoInRegistration = 0;
+		$post['params']['showCostInfoInRegistration'] = $showCostInfoInRegistration;
+		if (KRequest::get('post.showPlacesLeftInRegistration', 'string') != null) $showPlacesLeftInRegistration = 1; else $showPlacesLeftInRegistration = 0;
+		$post['params']['showPlacesLeftInRegistration'] = $showPlacesLeftInRegistration;
+		if (KRequest::get('post.showEventPictureInRegistration', 'string') != null) $showEventPictureInRegistration = 1; else $showEventPictureInRegistration = 0;
+		$post['params']['showEventPictureInRegistration'] = $showEventPictureInRegistration;
+		if (KRequest::get('post.showEventFullDescriptionInRegistration', 'string') != null) $showEventFullDescriptionInRegistration = 1; else $showEventFullDescriptionInRegistration = 0;
+		$post['params']['showEventFullDescriptionInRegistration'] = $showEventFullDescriptionInRegistration;
+		if (KRequest::get('post.showEventDescriptionSnippetInRegistration', 'string') != null) $showEventDescriptionSnippetInRegistration = 1; else $showEventDescriptionSnippetInRegistration = 0;
+		$post['params']['showEventDescriptionSnippetInRegistration'] = $showEventDescriptionSnippetInRegistration;
+		if (KRequest::get('post.showEventDateInRegistration', 'string') != null) $showEventDateInRegistration = 1; else $showEventDateInRegistration = 0;
+		$post['params']['showEventDateInRegistration'] = $showEventDateInRegistration;
+		if (KRequest::get('post.showBigDateBadgeInRegistration', 'string') != null) $showBigDateBadgeInRegistration = 1; else $showBigDateBadgeInRegistration = 0;
+		$post['params']['showBigDateBadgeInRegistration'] = $showBigDateBadgeInRegistration;
+		if (KRequest::get('post.showEventAddressInRegistration', 'string') != null) $showEventAddressInRegistration = 1; else $showEventAddressInRegistration = 0;
+		$post['params']['showEventAddressInRegistration'] = $showEventAddressInRegistration;
+		if (KRequest::get('post.showTimeInRegistration', 'string') != null) $showTimeInRegistration = 1; else $showTimeInRegistration = 0;
+		$post['params']['showTimeInRegistration'] = $showTimeInRegistration;
+		if (KRequest::get('post.showReadMoreInRegistration', 'string') != null) $showReadMoreInRegistration = 1; else $showReadMoreInRegistration = 0;
+		$post['params']['showReadMoreInRegistration'] = $showReadMoreInRegistration;
+
 
 		// End checkboxes
 

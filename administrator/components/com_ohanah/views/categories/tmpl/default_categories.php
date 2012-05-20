@@ -15,7 +15,7 @@
 		<td class="first">&nbsp;</td>
 		<td><?= @helper('grid.checkbox', array('row' => $category))?></td>
 		<td><a href="<?=@route('view=category&id='.$category->id)?>"><?=$category->title?></a></td>
-		<td><?=$category->description?></td>
+		<td style="max-width:350px; padding-right:50px"><?=$category->description?></td>
 		<td class="biggest"><a href="<?=@route('view=events&ohanah_category_id='.$category->id.'&format=html')?>"><?= @service('com://admin/ohanah.model.events')->set('ohanah_category_id', $category->id)->set('filterEvents', 'notpast')->getTotal() ?><img src="media://com_ohanah/v2/ohanah_images/icon_openview.png" /></a></td>
 		<td><?= @helper('grid.enable', array('row' => $category)) ?></td>
 	</tr>

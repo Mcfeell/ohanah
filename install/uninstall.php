@@ -23,7 +23,7 @@ if ($joomlaVersion == '1.6')
 		{
 			$mname = $module->getAttribute('module');
 			$db = & JFactory::getDBO();
-			$query = "SELECT `id` FROM `#__extensions` WHERE type='module' AND name = ".$db->Quote($mname)."";
+			$query = "SELECT `extension_id` FROM `#__extensions` WHERE type='module' AND name = ".$db->Quote($mname)."";
 			$db->setQuery($query);
 			$modules = $db->loadResultArray();
 			if (count($modules)) {
@@ -73,7 +73,7 @@ if ($joomlaVersion == '1.6')
 		{
 			$mname = $plugin->getAttribute('plugin');
 			$db = & JFactory::getDBO();
-			$query = "SELECT `id` FROM `#__extensions` WHERE type='plugin' AND name = ".$db->Quote($mname)."";
+			$query = "SELECT `extension_id` FROM `#__extensions` WHERE type='plugin' AND name = ".$db->Quote($mname)."";
 			$db->setQuery($query);
 			$plugins = $db->loadResultArray();
 			if (count($plugins)) {

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		1.0.9
+ * @version		2.0.14
  * @package		mod_ohanahcalendar
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -17,30 +17,4 @@ class ModOhanahcalendarHtml extends ModDefaultHtml
         $this->params  = $config->params;
     }
 	
-	public function getDaysBetweenDates($event) {  
-		$days[] = substr($event->date,0,10);
-		
-		if ($event->end_time_enabled) {
-
-			$sStartDate = $event->date;
-			$sEndDate = $event->end_date;
-
-			$sStartDate = gmdate("Y-m-d", strtotime("+1 day", strtotime($event->date)));  	
-
-			$sCurrentDate = $event->date;
-
-			if (substr($event->date,0,10) != substr($event->end_date,0,10)) {
-				while(substr($sCurrentDate,0,10) < substr($event->end_date,0,10)){  
-					$oldCurrentDate = $sCurrentDate;
-					if ($oldCurrentDate == gmdate("Y-m-d", strtotime("+1 days", strtotime($sCurrentDate)))) 
-						$sCurrentDate = gmdate("Y-m-d", strtotime("+2 days", strtotime($sCurrentDate)));
-					else 
-				  		$sCurrentDate = gmdate("Y-m-d", strtotime("+1 days", strtotime($sCurrentDate)));
-				  	$days[] = $sCurrentDate;  
-				}
-			}
-		}	
-
-		return $days; 
-	}
 }

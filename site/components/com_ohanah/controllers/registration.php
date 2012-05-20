@@ -1,6 +1,6 @@
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -92,6 +92,16 @@ class ComOhanahControllerRegistration extends ComDefaultControllerDefault
 			$params .= 'custom_field_value_4_person_'.$i.'='.KRequest::get('post.custom_field_value_4_person_'.$i, 'string').PHP_EOL;
 		for ($i = 1; $i <= 5; $i++) 
 			$params .= 'custom_field_value_5_person_'.$i.'='.KRequest::get('post.custom_field_value_5_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_6_person_'.$i.'='.KRequest::get('post.custom_field_value_6_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_7_person_'.$i.'='.KRequest::get('post.custom_field_value_7_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_8_person_'.$i.'='.KRequest::get('post.custom_field_value_8_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_9_person_'.$i.'='.KRequest::get('post.custom_field_value_9_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_10_person_'.$i.'='.KRequest::get('post.custom_field_value_10_person_'.$i, 'string').PHP_EOL;
 
 		return $params;
 	}
@@ -100,28 +110,21 @@ class ComOhanahControllerRegistration extends ComDefaultControllerDefault
 	protected function _actionAdd(KCommandContext $context)
 	{	
 		$context->data['params'] = $this->processParams();
+		$data = $context->data;
 
-		//Override KControllerService to prevent problem Resource Already Exists
-		$data = $this->getModel()->getItem();
-	    $data->setData(KConfig::unbox($context->data));
-	    
-	    //Only throw an error if the action explicitly failed.
-	    if($data->save() === false) 
-	    {    
-		    $error = $data->getStatusMessage();
-	        $context->setError(new KControllerException(
-	           $error ? $error : 'Add Action Failed', KHttpResponse::INTERNAL_SERVER_ERROR
-	        ));
-	       
-	    } 
-	    else $context->status = KHttpResponse::CREATED;
-		//END Override KControllerService to prevent problem Resource Already Exists
+		$created_on = gmdate('Y-m-d H:i:s');
 
-		KRequest::set('post.ohanah_registration_id', $data->id);
+		$database = JFactory::getDBO();
+		$database->setQuery("INSERT INTO `#__ohanah_registrations` (`ohanah_event_id`, `name`, `email`, `number_of_tickets`, `text`, `notes`, `created_by`, `created_on`, `paid`, `checked_in`, `params`) VALUES ('".$data->ohanah_event_id."', '".$data->name."', '".$data->email."', '".$data->number_of_tickets."', '".$data->text."', '".$data->notes."', '".JFactory::getUser()->get('id')."', '".$created_on."', 0, 0, '".$data->params."');");
+		$database->query();
+
+		$database->setQuery("SELECT ohanah_registration_id FROM `#__ohanah_registrations` WHERE `created_on` = '".$created_on."'");
+		$registration_id = $database->loadResult();
+		KRequest::set('post.ohanah_registration_id', $registration_id);
 
 		$event = $this->getService('com://site/ohanah.model.events')->id(KRequest::get('post.ohanah_event_id', 'int'))->getItem();
 
-		$this->getService('com://admin/ohanah.controller.mixpanel')->ohstats('new_registration', array('number_of_tickets'=> KRequest::get('post.number_of_tickets', 'string'), 'ticket_cost' => $event->ticket_cost.' '.JComponentHelper::getParams('com_ohanah')->get('payment_currency')));
+		//$this->getService('com://admin/ohanah.controller.mixpanel')->ohstats('new_registration', array('number_of_tickets'=> KRequest::get('post.number_of_tickets', 'string'), 'ticket_cost' => $event->ticket_cost.' '.JComponentHelper::getParams('com_ohanah')->get('payment_currency')));
 
 		if (JComponentHelper::getParams('com_ohanah')->get('enableEmailNewRegistration')) 
 		{
@@ -215,11 +218,20 @@ class ComOhanahControllerRegistration extends ComDefaultControllerDefault
 				}
 			}
 			
-			return $result = array(
-				'message' 		=> JText::_('YOU_HAVE_JOINED_THIS_EVENT'),
-				'messageType' 	=> 'Notice',
-				'url' 			=> JRoute::_($url, false),
-			);
+			if (!$this->_message) {
+				return $result = array(
+					'message' 		=> JText::_('YOU_HAVE_JOINED_THIS_EVENT'),
+					'messageType' 	=> 'Notice',
+					'url' 			=> JRoute::_($url, false),
+				);
+			} else {
+				return $result = array(
+					'message' 		=> $this->_message,
+					'messageType' 	=> 'Notice',
+					'url' 			=> JRoute::_($url, false),
+				);
+			}
+			
 		}
 		else 
 		{			

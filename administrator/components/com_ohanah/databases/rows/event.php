@@ -1,6 +1,6 @@
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -40,17 +40,6 @@ class ComOhanahDatabaseRowEvent extends KDatabaseRowDefault
 
 		return $return;
 	}
-
-	// public function isFuture()
-	// {
-	// 	$startDateEvent = new KDate(new KConfig(array('date' => $this->date)));
-	// 	$dateNow = new KDate();
-		
-	// 	if ($startDateEvent->toDays() > $dateNow->toDays())
-	// 		return true;	
-	// 	else
-	// 		return false;
-	// }
 	
 	public function getCreator()
 	{

@@ -29,17 +29,13 @@ defined('_JEXEC') or die('Restricted access'); ?>
 
 	    <script>
 			jQuery(document).ready(function(){
-		        var center = new google.maps.LatLng(37.4419, -122.1419);
 
 		        var map = new google.maps.Map(document.getElementById('map'), {
-		    	    zoom: 3,
-			        center: center,
 			      	scrollwheel: false,
 	        		mapTypeId: google.maps.MapTypeId.ROADMAP
 		        });
 
 				<? $count = 0 ?>
-
 
 		        var markers = [];
 				
@@ -65,6 +61,8 @@ defined('_JEXEC') or die('Restricted access'); ?>
 
 						google.maps.event.addListener(marker<?=$event->id?>, 'click', function() {
 							//console.log(marker<?=$event->id?>);
+							map.panTo(latLng<?=$event->id?>);
+
 					   		infowindow.close();
 					   		infowindow.content = contentString<?=$event->id?>;
 						  	infowindow.open(map, marker<?=$event->id?>);
@@ -72,32 +70,44 @@ defined('_JEXEC') or die('Restricted access'); ?>
 					<? endif ?>
 				<? endforeach ?>
 
+				var clusterOptions = {
+					'zoomOnClick': false
+				}
+
+				google.maps.event.addListener(map, 'zoom_changed', function() {
+					infowindow.close();
+				});
 
 
-		        var markerCluster = new MarkerClusterer(map, markers);
-				
+
+		        var markerCluster = new MarkerClusterer(map, markers, clusterOptions);
 				// Listen for a cluster to be clicked
 				google.maps.event.addListener(markerCluster, 'clusterclick', function(cluster) {
 
-			   		var content = '';
+					map.panTo(cluster.center_);
 
-			   		// Convert lat/long from cluster object to a usable MVCObject
-			   		var info = new google.maps.MVCObject;
-			   		info.set('position', cluster.center_);
+					if (map.getZoom() < 9) {
+						map.setZoom(map.getZoom() + 2);
+					} else {
 
+						var content = '';
+	 
+				   		// Convert lat/long from cluster object to a usable MVCObject
+				   		var info = new google.maps.MVCObject;
+				   		info.set('position', cluster.center_);
+	 
+				   		var markers = cluster.getMarkers();
+				   		var content = '<div id="content">';
+				   		for (var i = 0; i < markers.length; i++) {
+				   			//console.log(markers[i]);
+							content += '<a href="'+markers[i].url+'">'+markers[i].title+' ('+markers[i].date+')</a><br />';
+				   		}
+				   		content += '</div>';
 
-			   		var markers = cluster.getMarkers();
-			   		var content = '<div id="content">';
-			   		for (var i = 0; i < markers.length; i++) {
-			   			//console.log(markers[i]);
-						content += '<a href="'+markers[i].url+'">'+markers[i].title+' ('+markers[i].date+')</a><br />';
-			   		}
-			   		content += '</div>';
-
-
-			   		infowindow.close();
-			   		infowindow.setContent(content);
-			 		infowindow.open(map, info);
+						infowindow.close();
+				   		infowindow.setContent(content);
+				 		infowindow.open(map, info);
+					}
 				});
 
 				map.setCenter(latlngbounds.getCenter());

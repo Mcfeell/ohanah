@@ -8,8 +8,7 @@
 		<? JFactory::getApplication()->set('jquery', true); ?>
 	<? endif; ?>
 	<script src="media://com_ohanah/js/jquery-ui.custom.min.js" />
-	<style src="media://com_ohanah/css/join/jquery-ui.custom.css" />
-	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+	<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 	<style src="media://com_ohanah/css/screen.css" />
 	
 	<?= @helper('module.injector', array('title' => '', 'placeholder' => 'ohanah-list-events-1', 'position' => $params->get('listEventsModulePosition1'))) ?>
@@ -48,7 +47,7 @@
 			<? endforeach; ?>	
 		<? endif; ?>
 			
-		<? if ($pageParameters->get('usePagination')) : ?>
+		<? if ($pageParameters->get('usePagination', 1)) : ?>
 			<?= @helper('paginator.pagination', array('total' => $total)) ?>
 		<? endif ?>
 	

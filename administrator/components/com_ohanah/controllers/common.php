@@ -1,7 +1,7 @@
 <?php defined('_JEXEC') or die('Restricted access'); ?>
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -15,26 +15,6 @@ class ComOhanahControllerCommon extends ComDefaultControllerDefault
 	public function setMessage(KCommandContext $context)
 	{}
 
-	protected function _createThumb($file)
-	{
-		if (extension_loaded('gd') && function_exists('gd_info')) { //Create thumb only if GD Library is installed
-			$thumbpath = JPATH_ROOT.DS.'media/com_ohanah/attachments_thumbs'.DS.$file;
-			
-			$image = new SimpleImage();
-			$image->load(JPATH_ROOT.DS.'media/com_ohanah/attachments'.DS.$file);
-			
-			list($width, $height, $type, $attr) = getimagesize(JPATH_ROOT.DS.'media/com_ohanah/attachments'.DS.$file);
-			
-			if($width > $height) {
-				$image->resizeToWidth(167);
-			} else {
-				$image->resizeToHeight(114);
-			}
-
-			$image->save($thumbpath);
-		}
-	}
-	
 	protected function _processImages($target_type, $temp_id, $real_id)
 	{
 		$images = KService::get('com://admin/ohanah.model.attachments')->set('target_type', $target_type)->set('target_id', $temp_id)->getList();
@@ -133,119 +113,44 @@ class ComOhanahControllerCommon extends ComDefaultControllerDefault
 		$context->data = $data;
 		$row = parent::_actionEdit($context);
 	}
-		
-	protected function _saveFile($file, $target_type, $target_id)
-	{
-		if (JFile::exists($file['tmp_name']))
-		{
-			$fileSafeName = JFile::makeSafe($file['name']);
-			$randomNumber = rand();
-			if (JFile::upload($file['tmp_name'], JPATH_ROOT.DS.'media/com_ohanah/attachments'.DS.$randomNumber.'-'.$fileSafeName)) {
-				$fileName = $randomNumber.'-'.$fileSafeName;
-				$this->_createThumb($fileName);
-				
-				$attachment = $this->getService('com://admin/ohanah.model.attachments')->getItem();
-				$attachment->name = $randomNumber.'-'.$fileSafeName;
-				$attachment->target_type = $target_type;
-				$attachment->target_id = $target_id;
-				$attachment->setStatus(NULL);
-				$attachment->save();
+
+	protected function _processTime($data) {
+		// start time processing
+		$sh = $data['start_time_h'];
+		$sampm = $data['start_time_ampm'];
+		if (isset($sampm)) {
+			if ($sampm == "AM") { // if it's AM, then only conversion is that 12:30 AM is 00:30 in 24h format
+				if ($sh == "12") {
+					$sh = "00";
+				}
+			} else { // it's PM
+				if (intval($sh) < 12) { // if it's 12, we leave 12, but if anything else, we add 12 so we get 13, 14... 
+					$sh = strval(intval($sh) + 12);
+				}
 			}
-			else
-				JError::raiseWarning(0, 'Could not upload file');			
 		}
+		$data['start_time'] = strval($sh).":".$data['start_time_m'];
+
+		// end time processing
+		$eh = $data['end_time_h'];
+		$eampm = $data['end_time_ampm'];
+		if (isset($eampm)) {
+			if ($eampm == "AM") { // if it's AM, then only conversion is that 12:30 AM is 00:30 in 24h format
+				if ($eh == "12") {
+					$eh = "00";
+				}
+			} else { // it's PM
+				if (intval($eh) < 12) { // if it's 12, we leave 12, but if anything else, we add 12 so we get 13, 14... 
+					$eh = strval(intval($eh) + 12);
+				}
+			}
+		}
+		$data['end_time'] = strval($eh).":".$data['end_time_m'];
+		
+
+
+		return $data;
+
+
 	}
-}
-
-/*
-* File: SimpleImage.php
-* Author: Simon Jarvis
-* Copyright: 2006 Simon Jarvis
-* Date: 08/11/06
-* Link: http://www.white-hat-web-design.co.uk/articles/php-image-resizing.php
-* 
-* This program is free software; you can redistribute it and/or 
-* modify it under the terms of the GNU General Public License 
-* as published by the Free Software Foundation; either version 2 
-* of the License, or (at your option) any later version.
-* 
-* This program is distributed in the hope that it will be useful, 
-* but WITHOUT ANY WARRANTY; without even the implied warranty of 
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-* GNU General Public License for more details: 
-* http://www.gnu.org/licenses/gpl.html
-*
-*/
- 
-class SimpleImage {
-   
-	var $image;
-   	var $image_type;
- 
-   	function load($filename) {
-      	$image_info = getimagesize($filename);
-      	$this->image_type = $image_info[2];
-      	if( $this->image_type == IMAGETYPE_JPEG ) {
-         	$this->image = imagecreatefromjpeg($filename);
-      	} elseif( $this->image_type == IMAGETYPE_GIF ) {
-         	$this->image = imagecreatefromgif($filename);
-      	} elseif( $this->image_type == IMAGETYPE_PNG ) {
-         	$this->image = imagecreatefrompng($filename);
-      	}
-   	}
-   
-	function save($filename, $image_type=IMAGETYPE_JPEG, $compression=75, $permissions=null) {
-      	if( $image_type == IMAGETYPE_JPEG ) {
-         	imagejpeg($this->image,$filename,$compression);
-      	} elseif( $image_type == IMAGETYPE_GIF ) {
-         	imagegif($this->image,$filename);         
-      	} elseif( $image_type == IMAGETYPE_PNG ) {
-         	imagepng($this->image,$filename);
-      	}   
-      	if( $permissions != null) {
-         	chmod($filename,$permissions);
-      	}
-   	}
-   
-	function output($image_type=IMAGETYPE_JPEG) {
-      	if( $image_type == IMAGETYPE_JPEG ) {
-         	imagejpeg($this->image);
-      	} elseif( $image_type == IMAGETYPE_GIF ) {
-         	imagegif($this->image);         
-      	} elseif( $image_type == IMAGETYPE_PNG ) {
-         	imagepng($this->image);
-      	}   
-   	}
-
-   	function getWidth() {
-      	return imagesx($this->image);
-   	}
-
-   	function getHeight() {
-      	return imagesy($this->image);
-   	}
-
-   	function resizeToHeight($height) {
-      	$ratio = $height / $this->getHeight();
-      	$width = $this->getWidth() * $ratio;
-      	$this->resize($width,$height);
-   	}
-
-   	function resizeToWidth($width) {
-      	$ratio = $width / $this->getWidth();
-      	$height = $this->getheight() * $ratio;
-      	$this->resize($width,$height);
-   	}
-
-   	function scale($scale) {
-      	$width = $this->getWidth() * $scale/100;
-      	$height = $this->getheight() * $scale/100; 
-      	$this->resize($width,$height);
-   	}
-   	
-	function resize($width,$height) {
-      	$new_image = imagecreatetruecolor($width, $height);
-      	imagecopyresampled($new_image, $this->image, 0, 0, 0, 0, $width, $height, $this->getWidth(), $this->getHeight());
-      	$this->image = $new_image;   
-   	}
 }

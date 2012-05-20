@@ -3,6 +3,13 @@
 
 <?=@helper('behavior.mootools'); ?>
 
+<?
+// Load language file
+$lang = &JFactory::getLanguage();
+$lang->load('com_ohanah');
+$lang->load('com_ohanah', JPATH_ADMINISTRATOR);
+?>
+
 <style src="media://com_ohanah/v2/frontend-event-form.css" />
 <div class="panelContent ohanah">
 
@@ -11,7 +18,7 @@
 		<? JFactory::getApplication()->set('jquery', true); ?>
 	<? endif; ?>
 
-	<style src="media://com_ohanah/v2/ohanah_css/custom-theme/jquery-ui-1.8.14.custom.css" />
+	<style src="media://com_ohanah/css/jquery-ui.css" />
 	<script src="media://com_ohanah/js/jquery-ui.custom.min.js" />
 
 	<?=@helper('behavior.mootools'); ?>
@@ -50,14 +57,19 @@
 					<? endif; ?>
 				<? endfor ?>
 
-				<? if ($event->payment_gateway != 'custom') : ?>
+				<? if ($event->payment_gateway != 'custom' && $event->allow_only_one_ticket != 1) : ?>
 
 					<? 
-					$available = ($event->attendees_limit - $event->countAttendees()); 
-					if ($available < 0) $available = 0; 
-
-
-					if (!$event->attendees_limit) $available = 5;
+					if ($event->limit_number_of_attendees) {
+						if (!$event->attendees_limit) {
+							$available = 5;
+						} else {
+							$available = ($event->attendees_limit - $event->countAttendees()); 
+							if ($available < 0) $available = 0; 	
+						}
+					} else {
+						$available = 5;
+					}
 					?>
 
 					<div>
@@ -131,6 +143,9 @@
 							});
 						</script>	
 					</div>
+
+				<? else : ?>
+					<input type="hidden" name="number_of_tickets" value="1" />
 				<? endif ?>
 
 				<br />
@@ -149,16 +164,13 @@
 				<input type="hidden" name="ohanah_event_id" id="ohanah_event_id" value="<?=KRequest::get('get.ohanah_event_id', 'int')?>" />
 				<input type="hidden" name="Itemid" id="Itemid" value="<?=KRequest::get('get.Itemid', 'int')?>" />
 			
-				<? if ($event->payment_gateway != 'custom') : ?>
-					
-					<? 
-					if ($event->payment_gateway != 'none' && $event->ticket_cost) $text = 'OHANAH_BUY_TICKETS';
-					else $text = 'OHANAH_REGISTER';
-					?>
+				<? 
+				if ($event->payment_gateway != 'none' && $event->ticket_cost) $text = 'OHANAH_BUY_TICKETS';
+				else $text = 'OHANAH_REGISTER';
+				?>
 
-					<?= @helper('button.button', array('type' => 'input', 'text' => @text($text))); ?>
+				<?= @helper('button.button', array('type' => 'input', 'text' => @text($text))); ?>
 
-				<?endif?>
 			</form>
 		<? else : ?>
 			<?=@text('OHANAH_TICKETS_SOLD_OUT')?>

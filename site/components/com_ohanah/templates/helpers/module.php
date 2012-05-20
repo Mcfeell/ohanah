@@ -11,8 +11,6 @@ class ComOhanahTemplateHelperModule extends KTemplateHelperBehavior
 		if ($config->placeholder) {
 			if (count($modules = JModuleHelper::getModules($config->placeholder))) {
 				foreach($modules as $module) {
-					$string = '';
-
 					$module_params = new JParameter($module->params);
 
 					if ($config->title) {
@@ -23,11 +21,11 @@ class ComOhanahTemplateHelperModule extends KTemplateHelperBehavior
 
 					$config->sfx ? $sfx = $config->sfx : $sfx = $module_params->get('moduleclass_sfx');
 
-					$string .= '<module prepend="0" params="moduleclass_sfx='.$sfx.'" '.$title.' position="'.$config->position.'">';
+					$string = '<module prepend="0" params="moduleclass_sfx='.$sfx.'" '.$title.' position="'.$config->position.'">';
 					$string .= JModuleHelper::renderModule($module);
 					$string .= '</module>';
 
-					$return = $string . $return;
+					$return = $string.$return;
 				}
 			}
 		} else {

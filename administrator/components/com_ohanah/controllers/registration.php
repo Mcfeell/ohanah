@@ -2,7 +2,7 @@
 
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -56,7 +56,7 @@ class ComOhanahControllerRegistration extends ComDefaultControllerDefault
 		$data = array('apikey' => $apiKey, 'id'	=> $listId, 'email_address' => $email, 'send_goodbye' => false, 'send_notify' => false);
 		$payload = json_encode($data);
 		 
-		$submit_url = 'http://'.substr($apiKey, strlen($apiKey)-3, 3).'.api.mailchimp.com/1.3/?method=listUnsubscribe';
+		$submit_url = '//'.substr($apiKey, strlen($apiKey)-3, 3).'.api.mailchimp.com/1.3/?method=listUnsubscribe';
 	
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $submit_url);
@@ -123,6 +123,17 @@ class ComOhanahControllerRegistration extends ComDefaultControllerDefault
 			$params .= 'custom_field_value_4_person_'.$i.'='.KRequest::get('post.custom_field_value_4_person_'.$i, 'string').PHP_EOL;
 		for ($i = 1; $i <= 5; $i++) 
 			$params .= 'custom_field_value_5_person_'.$i.'='.KRequest::get('post.custom_field_value_5_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_6_person_'.$i.'='.KRequest::get('post.custom_field_value_6_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_7_person_'.$i.'='.KRequest::get('post.custom_field_value_7_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_8_person_'.$i.'='.KRequest::get('post.custom_field_value_8_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_9_person_'.$i.'='.KRequest::get('post.custom_field_value_9_person_'.$i, 'string').PHP_EOL;
+		for ($i = 1; $i <= 5; $i++) 
+			$params .= 'custom_field_value_10_person_'.$i.'='.KRequest::get('post.custom_field_value_10_person_'.$i, 'string').PHP_EOL;
+
 
 		return $params;
 	}
@@ -139,7 +150,10 @@ class ComOhanahControllerRegistration extends ComDefaultControllerDefault
 
 	protected function _actionEdit(KCommandContext $context)
 	{	
-		$context->data['params'] = $this->getService('com://admin/ohanah.controller.registration')->processParams();
+		if (KRequest::get('get.view', 'string') == 'registration') {
+			$context->data['params'] = $this->getService('com://admin/ohanah.controller.registration')->processParams();
+		}
+
 		$this->_message = JText::_('OHANAH_SAVED_CHANGES');
 
 		return parent::_actionEdit($context);

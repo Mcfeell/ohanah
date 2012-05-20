@@ -90,64 +90,6 @@ $database = JFactory::getDBO();
 $joomlaVersion = JVersion::isCompatible('1.6.0') ? '>1.5' : '1.5';
 
 
-
-
-if (in_array($db->getPrefix().'ohanah_events', $db->getTableList())) { // Upgrade
-
-
-	$db =& JFactory::getDBO();
-
-	if ($joomlaVersion == '1.5') { 
-		$table =& JTable::getInstance('component');
-		$table->loadByOption('com_ohanah');
-
-		jimport('joomla.filesystem.folder');
-
-		$db->setQuery('SELECT * FROM #__components WHERE admin_menu_link=\'option=com_ohanah\'');		
-
-		/* Get the component base directory */
-		$adminDir = JPATH_ADMINISTRATOR .DS. 'components';
-		$siteDir = JPATH_SITE .DS. 'components';
-
-		$row = $db->loadObject();
-
-		/* Get the component folder and list of xml files in folder */
-		$folder = $adminDir.DS.$row->option;
-		if (JFolder::exists($folder)) {
-			$xmlFilesInDir = JFolder::files($folder, '.xml$');
-		} else {
-			$folder = $siteDir.DS.$row->option;
-			if (JFolder::exists($folder)) {
-				$xmlFilesInDir = JFolder::files($folder, '.xml$');
-			} else {
-				$xmlFilesInDir = null;
-			}
-		}
-		if (count($xmlFilesInDir)) {
-			foreach ($xmlFilesInDir as $xmlfile) {
-				if ($data = JApplicationHelper::parseXMLInstallFile($folder.DS.$xmlfile)) {
-					foreach($data as $key => $value) {
-						$row->$key = $value;
-					}
-				}
-				$row->jname = JString::strtolower(str_replace(" ", "_", $row->name));
-			}
-		}
-		$version = $row->version;
-
-	} else {
-		$table =& JTable::getInstance('extension');
-		$db->setQuery('SELECT extension_id FROM #__extensions WHERE type="component" AND element="com_ohanah"');
-		$table->load($db->loadResult());
-		$version = json_decode($table->manifest_cache)->version;
-	}
-
-	if ($version && version_compare($version, '2.0.1b1', 'lt')) {	
-		// $this->parent->abort(JText::_("We're sorry but Ohanah 2.0 Beta is not supporting updates from the version 1.0. You need to install it on a clean site (or uninstall version 1.0 and delete the database tables). The stable version will support updating."));
-		// echo "We're sorry but Ohanah 2.0 Beta is not supporting updates from the version 1.0. You need to install it on a clean site (or uninstall version 1.0 and delete the database tables). The stable version will support updating.";
-	}
-}
-
 //Install Nooku
 $source	= $this->parent->getPath('source').DS.'nooku'; 
 if (JFolder::exists($source)) {
@@ -268,9 +210,11 @@ if ($joomlaVersion == '>1.5')
 	$db->setQuery($query);
 	$component_id = $db->loadResult();
 	
-	$query = "UPDATE #__menu SET menutype='menu', component_id=".$component_id." WHERE path='ohanah' OR path='ohanah/events' OR path='ohanah/categories'";
-	$db->setQuery($query);
-	$db->query();
+	if ($component_id) {
+		$query = "UPDATE #__menu SET menutype='menu', component_id=".$component_id." WHERE path='ohanah' OR path='ohanah/events' OR path='ohanah/categories'";
+		$db->setQuery($query);
+		$db->query();	
+	}
 }
 else
 {
@@ -309,7 +253,7 @@ if(!function_exists('ohstats'))
 	    $params = array('event' => $event, 'properties' => $properties);
 	    $params['properties']['token'] = '41aca88360ef6164533944b503484055';
 	    $params['properties']['ip'] = $_SERVER['REMOTE_ADDR'];
-	    $params['properties']['ohanah_version'] = '2.0.1';
+	    $params['properties']['ohanah_version'] = '2.0.14';
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, 'http://api.mixpanel.com/track/?data=' . base64_encode(json_encode($params)));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -396,7 +340,7 @@ if(!function_exists('executeOnce')) {
 		$db = & JFactory::getDBO();
 
 		//Set modules position if first install
-		$query = 'SELECT COUNT(*) FROM #__modules WHERE position="ohanah-single-event-1"';
+		$query = 'SELECT COUNT(*) FROM #__modules WHERE position="ohanah-single-event-1" OR position="ohanah-single-event-2" OR position="ohanah-single-event-3"';
 		$db->setQuery($query);
 		$results = $db->loadResult();
 
@@ -414,7 +358,7 @@ if(!function_exists('executeOnce')) {
 		}
 
 		//Set modules position if first install
-		$query = 'SELECT COUNT(*) FROM #__modules WHERE position="ohanah-list-events-1"';
+		$query = 'SELECT COUNT(*) FROM #__modules WHERE position="ohanah-list-events-1" OR position="ohanah-list-events-2" OR position="ohanah-list-events-3"';
 		$db->setQuery($query);
 		$results = $db->loadResult();
 
@@ -439,7 +383,7 @@ if(!function_exists('executeOnce')) {
 
 			if ($version) {
 				
-				if (version_compare($version, '1.0.30', '>') && version_compare($version, '2.0.1', '<')) {	 //use 1.0.30 as we'll never get to that number with priority/security 1.0.x releases
+				if (version_compare($version, '1.0.30', '>') && version_compare($version, '2.0.0', '<')) {	 //use 1.0.30 as we'll never get to that number with priority/security 1.0.x releases
 					//upgrading from a 2.0 beta
 
 					$events_columns = $db->getTableFields('#__ohanah_events');
@@ -471,11 +415,11 @@ if(!function_exists('executeOnce')) {
 					//Move images from old directory to new one
 						$beforePath = JPATH_ROOT.'/media/com_ohanah/events_images';
 						$afterPath = JPATH_ROOT.'/media/com_ohanah/attachments';
-					 	JFolder::move($beforePath, $afterPath);
+					 	if(JFolder::exists($beforePath)) JFolder::move($beforePath, $afterPath);
 
 					 	$beforePath = JPATH_ROOT.'/media/com_ohanah/events_thumbs';
 						$afterPath = JPATH_ROOT.'/media/com_ohanah/attachments_thumbs';
-					 	JFolder::move($beforePath, $afterPath);
+					 	if(JFolder::exists($beforePath)) JFolder::move($beforePath, $afterPath);
 
 					 	$beforePath = JPATH_ROOT.'/media/com_ohanah/venues_images/';
 						$afterPath = JPATH_ROOT.'/media/com_ohanah/attachments/';
@@ -688,6 +632,21 @@ if(!function_exists('executeOnce')) {
 								$db->query();
 							}
 
+						// correctly upgrade the venues
+							$db->setQuery('SELECT * FROM '.$db->getPrefix().'ohanah_events');
+							foreach ($db->loadObjectList() as $event) {
+
+								$db->setQuery("SELECT ohanah_venue_id FROM #__ohanah_venues WHERE title='".$event->venue."'");
+								$db->query();
+								$id = $db->loadResult();
+
+								if ($id) {
+									$query = "UPDATE `#__ohanah_events` SET `ohanah_venue_id` = '".$id."' WHERE ohanah_event_id = '".$event->ohanah_event_id."'";
+									$db->setQuery($query);
+									$db->query();
+								}
+							}
+
 					//Delete com_ohfrontent / com_ohmailchimp entries
 						$joomlaVersion = JVersion::isCompatible('1.6.0') ? '>1.5' : '1.5';
 
@@ -705,12 +664,22 @@ if(!function_exists('executeOnce')) {
 							$db->setQuery("DELETE FROM #__extensions WHERE element='mod_ohanaheventqwiki' OR element='mod_ohanahflyer'");
 							$db->query();
 						}
-				} else if (version_compare($version, '1.0.30', '<=')) {
-					//handle db changes from version 2.0.1 on
-				} 
+				} else if (version_compare($version, '2.0.5', '<=')) { //handle db changes from version 2.0.4 on
+					
+					$events_columns = $db->getTableFields('#__ohanah_events');
+					$events_columns = reset($events_columns);
 
+					if (!isset($events_columns['allow_only_one_ticket'])) {
+						$db->setQuery("ALTER TABLE #__ohanah_events ADD COLUMN allow_only_one_ticket TINYINT(1)");
+						$db->query();
+					}
+
+					if (isset($events_columns['ticketing_end_date'])) {
+						$db->setQuery("ALTER TABLE #__ohanah_events DROP COLUMN ticketing_end_date");
+						$db->query();
+					}
+				}
 			}
-
 
 			//Stats
 			$db =& JFactory::getDBO();
@@ -735,7 +704,7 @@ if(!function_exists('executeOnce')) {
 executeOnce();
 ?>
 
-<? $joomlaVersion = JVersion::isCompatible('1.6.0') ? '>1.5' : '1.5'; ?>
+<?php $joomlaVersion = JVersion::isCompatible('1.6.0') ? '>1.5' : '1.5'; ?>
 <?php if ($joomlaVersion == '1.5') : ?>
 <h3>****** Please note: the plugin 'System - Mootools upgrade' must be enabled otherwise the admin buttons won't work. *******</h3>
 <?php endif; ?>

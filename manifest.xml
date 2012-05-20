@@ -3,7 +3,7 @@
 <install type="component" version="1.5.0" method="upgrade" mootools="1.2">
 	<name>Ohanah</name>
 	<author>Beyounic SA</author>
-    <creationDate>2012-02-07</creationDate>
+    <creationDate>2012-05-15</creationDate>
 	<copyright>(C) 2012 Beyounic SA. All rights reserved.</copyright>
 	<license>GNU GPLv3</license>
 	<csslicense>CC-BY</csslicense>
@@ -20,9 +20,9 @@
     		- RC		blue
     		- Stable	#009199
     -->
-	<version status="Stable" color="darkorange">2.0.1</version>
+	<version status="Stable" color="darkorange">2.0.14</version>
 	<revision></revision>
-	<description>Ohanah Event Management Joomla Extension</description>
+	<description></description>
 
 	<!-- Credits -->
 	<credits>
@@ -71,8 +71,12 @@
 			<language tag="af-ZA">af-ZA/af-ZA.com_ohanah.sys.ini</language>
 	 		<language tag="ar-AA">ar-AA/ar-AA.com_ohanah.ini</language>
 			<language tag="ar-AA">ar-AA/ar-AA.com_ohanah.sys.ini</language>
+			<language tag="bg-BG">bg-BG/bg-BG.com_ohanah.ini</language>
+			<language tag="bg-BG">bg-BG/bg-BG.com_ohanah.sys.ini</language>
 			<language tag="bs-BA">bs-BA/bs-BA.com_ohanah.ini</language>
 			<language tag="bs-BA">bs-BA/bs-BA.com_ohanah.sys.ini</language>
+			<language tag="ca-ES">ca-ES/ca-ES.com_ohanah.ini</language>
+			<language tag="ca-ES">ca-ES/ca-ES.com_ohanah.sys.ini</language>
 			<language tag="cs-CZ">cs-CZ/cs-CZ.com_ohanah.ini</language>
 			<language tag="cs-CZ">cs-CZ/cs-CZ.com_ohanah.sys.ini</language>
 			<language tag="da-DK">da-DK/da-DK.com_ohanah.ini</language>
@@ -85,6 +89,12 @@
 			<language tag="en-GB">en-GB/en-GB.com_ohanah.sys.ini</language>
 	 		<language tag="es-ES">es-ES/es-ES.com_ohanah.ini</language>
 			<language tag="es-ES">es-ES/es-ES.com_ohanah.sys.ini</language>
+			<language tag="et-EE">et-EE/et-EE.com_ohanah.ini</language>
+ 			<language tag="et-EE">et-EE/et-EE.com_ohanah.sys.ini</language>
+			<language tag="fa-IR">fa-IR/fa-IR.com_ohanah.ini</language>
+			<language tag="fa-IR">fa-IR/fa-IR.com_ohanah.sys.ini</language>
+			<language tag="fi-FI">fi-FI/fi-FI.com_ohanah.ini</language>
+			<language tag="fi-FI">fi-FI/fi-FI.com_ohanah.sys.ini</language>
 			<language tag="fr-FR">fr-FR/fr-FR.com_ohanah.ini</language>
 			<language tag="fr-FR">fr-FR/fr-FR.com_ohanah.sys.ini</language>
 			<language tag="hr-HR">hr-HR/hr-HR.com_ohanah.ini</language>
@@ -93,12 +103,26 @@
 			<language tag="hu-HU">hu-HU/hu-HU.com_ohanah.sys.ini</language>
 			<language tag="it-IT">it-IT/it-IT.com_ohanah.ini</language>			
 			<language tag="it-IT">it-IT/it-IT.com_ohanah.sys.ini</language>			
+			<language tag="lv-LV">lv-LV/lv-LV.com_ohanah.ini</language>			
+			<language tag="lv-LV">lv-LV/lv-LV.com_ohanah.sys.ini</language>			
+			<language tag="mk-MK">mk-MK/mk-MK.com_ohanah.ini</language>
+			<language tag="mk-MK">mk-MK/mk-MK.com_ohanah.sys.ini</language>
 			<language tag="nb-NO">nb-NO/nb-NO.com_ohanah.ini</language>
-			<language tag="nb-NO">nb-NO/nb-NO.com_ohanah.sys.ini</language>
+			<language tag="nb-NO">nb-NO/nb-NO.com_ohanah.sys.ini</language>	
+			<language tag="nl-NL">nl-NL/nl-NL.com_ohanah.ini</language>			
+			<language tag="nl-NL">nl-NL/nl-NL.com_ohanah.sys.ini</language>			
+			<language tag="pl-PL">pl-PL/pl-PL.com_ohanah.ini</language>
+			<language tag="pl-PL">pl-PL/pl-PL.com_ohanah.sys.ini</language>
+			<language tag="pt-BR">pt-BR/pt-BR.com_ohanah.ini</language>
+			<language tag="pt-BR">pt-BR/pt-BR.com_ohanah.sys.ini</language>
+			<language tag="pt-PT">pt-PT/pt-PT.com_ohanah.ini</language>
+			<language tag="pt-PT">pt-PT/pt-PT.com_ohanah.sys.ini</language>
+			<language tag="ro-RO">ro-RO/ro-RO.com_ohanah.ini</language>
+			<language tag="ro-RO">ro-RO/ro-RO.com_ohanah.sys.ini</language>
 			<language tag="ru-RU">ru-RU/ru-RU.com_ohanah.ini</language>
 			<language tag="ru-RU">ru-RU/ru-RU.com_ohanah.sys.ini</language>
-			<language tag="sl-SL">sl-SL/sl-SL.com_ohanah.ini</language>
-			<language tag="sl-SL">sl-SL/sl-SL.com_ohanah.sys.ini</language>
+			<language tag="sl-SI">sl-SI/sl-SI.com_ohanah.ini</language>
+			<language tag="sl-SI">sl-SI/sl-SI.com_ohanah.sys.ini</language>
 			<language tag="sv-SE">sv-SE/sv-SE.com_ohanah.ini</language>
 			<language tag="sv-SE">sv-SE/sv-SE.com_ohanah.sys.ini</language>
 			<language tag="tr-TR">tr-TR/tr-TR.com_ohanah.ini</language>
@@ -112,19 +136,31 @@
 	 	<language tag="af-ZA">af-ZA/af-ZA.com_ohanah.ini</language>
 		<language tag="ar-AA">ar-AA/ar-AA.com_ohanah.ini</language>
 		<language tag="bs-BA">bs-BA/bs-BA.com_ohanah.ini</language>
+		<language tag="bg-BG">bg-BG/bg-BG.com_ohanah.ini</language>
+		<language tag="ca-ES">ca-ES/ca-ES.com_ohanah.ini</language>
 		<language tag="cs-CZ">cs-CZ/cs-CZ.com_ohanah.ini</language>
 		<language tag="da-DK">da-DK/da-DK.com_ohanah.ini</language>
 		<language tag="de-DE">de-DE/de-DE.com_ohanah.ini</language>
  		<language tag="el-GR">el-GR/el-GR.com_ohanah.ini</language>
  		<language tag="en-GB">en-GB/en-GB.com_ohanah.ini</language>
  		<language tag="es-ES">es-ES/es-ES.com_ohanah.ini</language>
+ 		<language tag="et-EE">et-EE/et-EE.com_ohanah.ini</language>
+		<language tag="fa-IR">fa-IR/fa-IR.com_ohanah.ini</language>
+		<language tag="fi-FI">fi-FI/fi-FI.com_ohanah.ini</language>
 		<language tag="fr-FR">fr-FR/fr-FR.com_ohanah.ini</language>
 		<language tag="hr-HR">hr-HR/hr-HR.com_ohanah.ini</language>
 		<language tag="hu-HU">hu-HU/hu-HU.com_ohanah.ini</language>
 		<language tag="it-IT">it-IT/it-IT.com_ohanah.ini</language>			
+		<language tag="lv-LV">lv-LV/lv-LV.com_ohanah.ini</language>			
+		<language tag="mk-MK">mk-MK/mk-MK.com_ohanah.ini</language>
 		<language tag="nb-NO">nb-NO/nb-NO.com_ohanah.ini</language>
+		<language tag="nl-NL">nl-NL/nl-NL.com_ohanah.ini</language>			
+		<language tag="pl-PL">pl-PL/pl-PL.com_ohanah.ini</language>
+		<language tag="pt-BR">pt-BR/pt-BR.com_ohanah.ini</language>
+		<language tag="pt-PT">pt-PT/pt-PT.com_ohanah.ini</language>
+		<language tag="ro-RO">ro-RO/ro-RO.com_ohanah.ini</language>
 		<language tag="ru-RU">ru-RU/ru-RU.com_ohanah.ini</language>
-		<language tag="sl-SL">sl-SL/sl-SL.com_ohanah.ini</language>
+		<language tag="sl-SL">sl-SI/sl-SI.com_ohanah.ini</language>
 		<language tag="sv-SE">sv-SE/sv-SE.com_ohanah.ini</language>
 		<language tag="tr-TR">tr-TR/tr-TR.com_ohanah.ini</language>
 		<language tag="zh-TW">zh-TW/zh-TW.com_ohanah.ini</language>
@@ -208,9 +244,9 @@
 			<file revision="1201">placeholder/placeholder.php</file>
 		</admin>-->
 		<site>
-			<folder revision="2.0.1">views/categories</folder>
-			<folder revision="2.0.1">views/category</folder>
-			<folder revision="2.0.1">views/venues</folder>
+			<folder revision="2.0.5">views/categories</folder>
+			<folder revision="2.0.5">views/category</folder>
+			<folder revision="2.0.5">views/venues</folder>
 		</site>
 		<!--
 		<media>

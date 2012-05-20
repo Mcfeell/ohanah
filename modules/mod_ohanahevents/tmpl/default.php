@@ -3,6 +3,11 @@ defined('_JEXEC') or die('Restricted access'); ?>
 <div class="ohanah module<?php echo $params->get( 'moduleclass_sfx' ) ?>">
 	<? if (JComponentHelper::getParams('com_ohanah')->get('itemid')) $itemid = '&Itemid='.JComponentHelper::getParams('com_ohanah')->get('itemid'); else $itemid = ''; ?>
 	
+	<? if (($params->get('loadJQuery') != '0') && (!JFactory::getApplication()->get('jquery'))) : ?>
+		<script src="media://com_ohanah/js/jquery.min.js" />
+		<? JFactory::getApplication()->set('jquery', true); ?>
+	<? endif; ?>
+
 	<? if ($displayStyle == 'ul_list') : ?>
 		<ul>
 			<? foreach ($events as $event) : ?>

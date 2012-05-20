@@ -52,6 +52,7 @@ class ComOhanahFilterSlug extends KFilterSlug
 
 		return $string;
 	}
+	
 	/**
 	 * Sanitize a value
 	 * 

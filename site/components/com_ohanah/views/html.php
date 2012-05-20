@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -28,6 +28,10 @@ class ComOhanahViewHtml extends ComDefaultViewHtml
 		$document->addStyleSheet(JURI::root(1).'/media/com_ohanah/css/screen.css');
 		$customCSS = JFactory::getApplication()->getPageParameters('com_ohanah')->get('customCSS'); 
 		$document->addStyleDeclaration($customCSS);
+		
+		if (JFactory::getApplication()->getPageParameters('com_ohanah')->get('showFeedLink', 0)) {
+			$document->addHeadLink(JRoute::_('index.php?option=com_ohanah&view=events&format=feed'), 'alternate', 'rel', array('type' => 'application/rss+xml', 'title' => 'Events feed'));	
+		}
 		
 		$this->assign('user', JFactory::getUser());
 	

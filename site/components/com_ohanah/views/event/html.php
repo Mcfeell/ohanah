@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -21,8 +21,17 @@ class ComOhanahViewEventHtml extends ComOhanahViewHtml
 			$event = $this->getService('com://site/ohanah.model.events')->set('id', $id)->getItem();
 		}
 
-		JFactory::getDocument()->setTitle($event->title);
-		JFactory::getDocument()->setDescription($event->description ? strip_tags($event->description) : $event->title);
+		if ($event->id) {
+			JFactory::getDocument()->setTitle($event->title);
+			JFactory::getDocument()->setDescription($event->description ? strip_tags($event->description) : $event->title);
+		} else {
+
+			if ($pageparameters->get('page_title')) {
+				JFactory::getDocument()->setTitle($pageparameters->get('page_title'));
+			} else {
+				JFactory::getDocument()->setTitle(JText::_('OHANAH_ADD_EVENT'));
+			}
+		}
 
 		if ($event->id || KRequest::get('get.layout', 'string') == 'form') {
 			if ($event->enabled) {

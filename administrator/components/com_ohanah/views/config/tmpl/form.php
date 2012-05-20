@@ -1,7 +1,7 @@
 <? (defined('_JEXEC') && defined('KOOWA')) or die('Restricted access'); ?>
 
 <style src="media://com_ohanah/v2/ohanah_css/jquery.cleditor.css" />
-<style src="media://com_ohanah/v2/ohanah_css/custom-theme/jquery-ui-1.8.14.custom.css" />
+<style src="media://com_ohanah/css/jquery-ui.css" />
 
 <?=@helper('behavior.mootools'); ?>
 <?=@helper('behavior.validator') ?>
@@ -13,6 +13,7 @@
 
 <script>
 	$jq(function() {    
+		$jq('#ohanah-config-layoutcomposer').hide();
 		$jq('#ohanah-config-email').hide();
 		$jq('#ohanah-config-injector').hide();
 		$jq('#ohanah-config-registration').hide();
@@ -34,6 +35,7 @@
 		<div id="settingsLeft">
 			<ul>
 				<li><a href="#" name="ohanah-config-layout" class="active"><?=@text('OHANAH_LAYOUT');?></a></li>
+				<li><a href="#" name="ohanah-config-layoutcomposer"><?=@text('Layout composer');?></a></li>
 				<li><a href="#" name="ohanah-config-email"><?=@text('OHANAH_EMAIL_CUSTOMIZATION');?></a></li>
 				<li><a href="#" name="ohanah-config-injector"><?=@text('OHANAH_MODULE_INJECTOR');?></a></li>
 				<li><a href="#" name="ohanah-config-registration"><?=@text('OHANAH_REGISTRATION_AND_PAYMENT');?></a></li>
@@ -45,6 +47,11 @@
 			<div class="panel" id="ohanah-config-layout">
 				<?= @template('form_layout', array('params' => $params)); ?>
 			</div>
+
+			<div class="panel" id="ohanah-config-layoutcomposer">
+				<?= @template('form_layoutcomposer', array('params' => $params)); ?>
+			</div>
+
 
 			<div class="panel" id="ohanah-config-email">
 				<?= @template('form_email', array('params' => $params)); ?>

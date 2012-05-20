@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@beyounic.com</authorEmail>
 	<authorUrl>app.ohanah.com</authorUrl>
-	<version>2.0.1</version>
+	<version>2.0.14</version>
 	<description></description>
 	<files>
 		<filename module="mod_ohanahcategoryinfo">mod_ohanahcategoryinfo.php</filename>

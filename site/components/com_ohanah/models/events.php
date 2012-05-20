@@ -1,6 +1,6 @@
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -107,5 +107,17 @@ class ComOhanahModelEvents extends KModelTable
 				$query->where("SUBTIME(CONCAT_WS(' ', `end_date`,`end_time`), CONCAT_WS('', `timezone`".$dst.",':0:0')) > UTC_TIMESTAMP()");			
 			}
 		}
+	}
+	
+	/**
+	 * Using the columns function so i can concat the starting date and	time that i need for the view
+	 * @see KModelTable::_buildQueryColumns()
+	 */
+	
+	protected function _buildQueryColumns(KDatabaseQuery$query)
+	{
+		$query->columns[]="tbl.*";
+		$query->columns[]=" CONCAT_WS('T',date,start_time) AS start ";
+		$query->columns[]=" CONCAT_WS('T',end_date,end_time) AS end ";
 	}
 }

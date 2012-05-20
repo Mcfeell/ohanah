@@ -1,6 +1,6 @@
 <? (defined('_JEXEC') && defined('KOOWA')) or die('Restricted access'); ?>
 
-<style src="media://com_ohanah/v2/ohanah_css/custom-theme/jquery-ui-1.8.14.custom.css" />
+<style src="media://com_ohanah/css/jquery-ui.css" />
 
 <script src="media://lib_koowa/js/koowa.js" />
 <?=@helper('behavior.mootools'); ?>
@@ -61,19 +61,9 @@
 			<div id="adminRight">
 				<div class="panel">
 					<div class="panelContent">
-						<table style="margin-bottom:14px;">
-							<tr>
-								<td><span class="fieldTitle"><?=@text('OHANAH_VENUE_PICTURE')?></span><br />
-									<div id="eventPicture">
-										
-									</div>
-								</td>
-								<input type="hidden" name="picture" id="picture" value="<?=$venue->picture?>" />
-							</tr>
-						</table>
 						<table>
 							<tr>
-								<td><span class="fieldTitle"><?=@text('OHANAH_PHOTOS')?><br />
+								<td><span class="fieldTitle"><?=@text('OHANAH_PHOTOS')?><br /><br />
 									<div id="eventPhotos">
 										
 									</div>

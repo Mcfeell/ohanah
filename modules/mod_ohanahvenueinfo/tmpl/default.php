@@ -18,7 +18,7 @@ defined('_JEXEC') or die('Restricted access'); ?>
 		
 			<? if ($numberOfPicturesFromPanoramio) : ?>
 				<div class="panoramio">
-					<a target="blank" class="link" href="http://www.panoramio.com/map/#lt=<?=$venue['latitude'] ?>&ln=<?=$venue['longitude'] ?>&z=4&k=2"><?=@text('FROM_PANORAMIO')?>:</a>
+					<a target="blank" class="link" href="http://www.panoramio.com/map/#lt=<?=$venue['latitude'] ?>&ln=<?=$venue['longitude'] ?>&z=4&k=2"><?=@text('OHANAH_SEE_ON_PANORAMIO')?>:</a>
 					<?php
 					$latitude = $venue['latitude'] ;
 					$longitude = $venue['longitude'];

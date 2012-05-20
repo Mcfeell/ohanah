@@ -149,13 +149,40 @@
 						<? if ($params->enableComments == 0) : ?>
 							$jq('#ohanah-comments-enabled-div').hide();
 						<? endif ?>
-					});
+
+						$jq('select[name="useFacebookComments"]').change(function(){
+							if($jq(this).attr('value')=="0") {
+								$jq('#ohanah-comments-enabled-custom-code').css('display', 'inline');
+							} else {
+								$jq('#ohanah-comments-enabled-custom-code').css('display', 'none');
+							}
+						});
+
+						<? if ($params->useFacebookComments == '1') : ?>
+							$jq('#ohanah-comments-enabled-custom-code').hide();
+						<? endif ?>
+					});					
 				</script>
+
+
 				<div id="ohanah-comments-enabled-div">
-					<div>
+					<br />
+					<div class="dropdownWrapper left">
+						<div class="dropdown size1">
+							<span id="recurr">
+								<select name="useFacebookComments" size="1">
+									<option value="1" <? if ($params->useFacebookComments == '1') echo 'selected="selected"'; ?>><?=@text('Facebook Comments')?></option>
+									<option value="0" <? if ($params->useFacebookComments == '0') echo 'selected="selected"'; ?>><?=@text('Custom')?></option>
+								</select>
+							</span>
+						</div>
+					</div>
+
+					<br /><br />
+					<div id="ohanah-comments-enabled-custom-code">
 						<span class="fieldTitle"><?=@text('OHANAH_COMMENTS_CODE'); ?></span><br/>
 						<textarea class="description" name="commentsCode" id="commentsCode"><?=$params->commentsCode?></textarea>
-						<span class="fieldTitle"><?=@text('OHANAH_EXAMPLE_OF_COMMENTS_YOU_COULD_USE');?>: <a target="_blank" href="http://disqus.com">Disqus</a> | <a target="_blank" href="http://developers.facebook.com/docs/reference/plugins/comments">Facebook Comments</a></span>
+						<span class="fieldTitle"><?=@text('OHANAH_EXAMPLE_OF_COMMENTS_YOU_COULD_USE');?>: <a target="_blank" href="http://disqus.com">Disqus</a></span>
 					</div>
 				</div>
 
@@ -182,6 +209,8 @@
 						</tr>
 					</table>
 				</div>
+
+
 			</td>
 			
 			<td class="part-right">
@@ -228,6 +257,29 @@
 						<?=@helper('com://admin/ohanah.template.helper.listbox.yes_or_no', array('name' => 'loadJQuery', 'selected' => $default)) ?>
 					</div>
 				</div>
+
+				<br />
+				<div class="break"></div>
+
+				<span class="fieldTitle"><?=@text('Add RSS Feed');?></span><br/>
+				<div class="dropdownWrapper left">
+					<div class="dropdown size4">
+						<? if (isset($params->showFeedLink)) $default = $params->showFeedLink; else $default = '0'; ?>
+						<?=@helper('com://admin/ohanah.template.helper.listbox.yes_or_no', array('name' => 'showFeedLink', 'selected' => $default)) ?>
+					</div>
+				</div>
+				<br />
+				<div class="break"></div>
+
+				<span class="fieldTitle"><?=@text('Local environment');?></span><br/>
+				<div class="dropdownWrapper left">
+					<div class="dropdown size4">
+						<? if (isset($params->localEnvironment)) $default = $params->localEnvironment; else $default = '0'; ?>
+						<?=@helper('com://admin/ohanah.template.helper.listbox.yes_or_no', array('name' => 'localEnvironment', 'selected' => $default)) ?>
+					</div>
+				</div>
+
+				
 			</td>
 		</tr>
 	</table>

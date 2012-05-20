@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -20,8 +20,13 @@ class ComOhanahViewEventsHtml extends ComOhanahViewHtml
 		$this->assign('pageParameters', $pageParameters);
 		$output = parent::display();
 
+		$title = $this->_generateTitle();
+
+		JFactory::getDocument()->setTitle($title);
+		JFactory::getDocument()->setDescription($title);
+
 		$this->getService('com://site/ohanah.template.filter.chrome', array(
-			'title' => $this->_generateTitle(), 
+			'title' => $title, 
 			'class' => array($params->get('moduleclass_sfx')), 
 			'styles' => array($params->get('module_chrome'))))
 			->write($output);

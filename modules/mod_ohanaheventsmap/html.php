@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		mod_sidebar
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -21,7 +21,7 @@ class ModOhanaheventsmapHtml extends ModDefaultHtml
 	{										
 		JFactory::getLanguage()->load('com_ohanah'); 
 		
-		$model = $this->getService('com://admin/ohanah.model.events');
+		$model = $this->getService('com://site/ohanah.model.events');
 		
 		if ($this->params->get('hidePastEvents') == '1') {
 			$model->set('filterEvents', 'notpast');
@@ -112,6 +112,8 @@ class ModOhanaheventsmapHtml extends ModDefaultHtml
 				}
 			}
 		}
+
+		$model->set('enabled', 1);
 		
 		$this->assign('events', $model->getList());
 		$this->assign('params', $this->params);

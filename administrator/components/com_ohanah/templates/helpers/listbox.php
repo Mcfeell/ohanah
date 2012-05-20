@@ -2,7 +2,7 @@
 
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -18,8 +18,10 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         $config = new KConfig($config);
         $config->append(array(
             'name'      => 'ohanah_category_id',
+        ))->append(array(
+            'selected'  => $config->{$config->name}
         ));
-        $categories = KService::get('com://site/ohanah.model.categories')->set('published', 'true')->getList();
+        $categories = KService::get('com://site/ohanah.model.categories')->set('published', 'true')->set('sort', 'title')->getList();
 
         $options = array();
         if ($config->prompt) $options[] = $this->option(array('text' => JText::_($config->prompt)));   
@@ -44,7 +46,7 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         $config->append(array(
             'name'      => 'ohanah_venue_id',
         ));
-        $venues = KService::get('com://site/ohanah.model.venues')->set('published', 'true')->getList();
+        $venues = KService::get('com://site/ohanah.model.venues')->set('published', 'true')->set('sort', 'title')->getList();
 
         $options = array();
         if ($config->prompt) $options[] = $this->option(array('text' => JText::_($config->prompt)));   
@@ -75,7 +77,9 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
             'selected'  => $config->{$config->name}
         ));
 
-        $events = KService::get('com://site/ohanah.model.events')->getList();
+        $events = KService::get('com://site/ohanah.model.events')
+            ->set('sort', 'geolocated_country')
+            ->getList();
 
         $array = array();
 
@@ -109,7 +113,10 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
             'selected'  => $config->{$config->name}
         ));
 
-        $events = KService::get('com://site/ohanah.model.events')->set('geolocated_country', KRequest::get('get.geolocated_country', 'string'))->getList();
+        $events = KService::get('com://site/ohanah.model.events')
+            ->set('geolocated_country', KRequest::get('get.geolocated_country', 'string'))
+            ->set('sort', 'geolocated_state')
+            ->getList();
 
         $array = array();
 
@@ -146,6 +153,7 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         $events = KService::get('com://site/ohanah.model.events')
                         ->set('geolocated_state', KRequest::get('get.geolocated_state', 'string'))
                         ->set('geolocated_country', KRequest::get('get.geolocated_country', 'string'))
+                        ->set('sort', 'geolocated_city')
                         ->getList();
 
         $array = array();
@@ -244,8 +252,6 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         return $this->optionlist($config);
     }
 
-
-
     public function published_or_draft( $config = array())
     {
         $config = new KConfig($config);
@@ -285,6 +291,9 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         $options[] = $this->option(array('text' => 'RocketTheme', 'value' => 'rockettheme'));
         $options[] = $this->option(array('text' => 'YooTheme', 'value' => 'yootheme'));
         $options[] = $this->option(array('text' => 'Gavick', 'value' => 'gavick'));
+        $options[] = $this->option(array('text' => 'JoomlArt', 'value' => 'joomlart'));
+        $options[] = $this->option(array('text' => 'Joomlabamboo', 'value' => 'joomlabamboo'));
+        $options[] = $this->option(array('text' => 'JoomlaXtc', 'value' => 'joomlaxtc'));
         $options[] = $this->option(array('text' => JText::_('OHANAH_NO_THEME'), 'value' => 'none'));
     
         //Add the options to the config object
@@ -292,7 +301,6 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         
         return $this->optionlist($config);
     }
-
 
     public function filterevents( $config = array())
     {
@@ -344,6 +352,64 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         return $this->optionlist($config);
     }
 
+
+    public function currency( $config = array())
+    {
+        $config = new KConfig($config);
+        $config->append(array(
+            'name'      => 'payment_currency',
+            'attribs'   => array(),
+            'deselect'  => true,
+            'prompt'    => 'OHANAH_SELECT',
+        ))->append(array(
+            'selected'  => $config->{$config->name}
+        ));
+        
+        $options = array();       
+        
+        $option = new KObject(); $option->text = "USD"; $option->value="USD"; $options[] = $option;
+        $option = new KObject(); $option->text = "EUR"; $option->value="EUR"; $options[] = $option;
+        $option = new KObject(); $option->text = "GBP"; $option->value="GBP"; $options[] = $option;
+        $option = new KObject(); $option->text = "CHF"; $option->value="CHF"; $options[] = $option;
+        $option = new KObject(); $option->text = "CAD"; $option->value="CAD"; $options[] = $option;
+        $option = new KObject(); $option->text = "JPY"; $option->value="JPY"; $options[] = $option;
+        $option = new KObject(); $option->text = "AUD"; $option->value="AUD"; $options[] = $option;
+        $option = new KObject(); $option->text = "BRL"; $option->value="BRL"; $options[] = $option;
+        $option = new KObject(); $option->text = "CZK"; $option->value="CZK"; $options[] = $option;
+        $option = new KObject(); $option->text = "DKK"; $option->value="DKK"; $options[] = $option;
+        $option = new KObject(); $option->text = "HKD"; $option->value="HKD"; $options[] = $option;
+        $option = new KObject(); $option->text = "HUF"; $option->value="HUF"; $options[] = $option;
+        $option = new KObject(); $option->text = "ILS"; $option->value="ILS"; $options[] = $option;
+        $option = new KObject(); $option->text = "JPY"; $option->value="JPY"; $options[] = $option;
+        $option = new KObject(); $option->text = "MYR"; $option->value="MYR"; $options[] = $option;
+        $option = new KObject(); $option->text = "MXN"; $option->value="MXN"; $options[] = $option;
+        $option = new KObject(); $option->text = "NOK"; $option->value="NOK"; $options[] = $option;
+        $option = new KObject(); $option->text = "NZD"; $option->value="NZD"; $options[] = $option;
+        $option = new KObject(); $option->text = "PHP"; $option->value="PHP"; $options[] = $option;
+        $option = new KObject(); $option->text = "PLN"; $option->value="PLN"; $options[] = $option;
+        $option = new KObject(); $option->text = "SGD"; $option->value="SGD"; $options[] = $option;
+        $option = new KObject(); $option->text = "SEK"; $option->value="SEK"; $options[] = $option;
+        $option = new KObject(); $option->text = "TWD"; $option->value="TWD"; $options[] = $option;
+        $option = new KObject(); $option->text = "THB"; $option->value="THB"; $options[] = $option;
+        $option = new KObject(); $option->text = "TRY"; $option->value="TRY"; $options[] = $option;
+        $option = new KObject(); $option->text = "AED&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="AED"; $options[] = $option;
+        $option = new KObject(); $option->text = "HRK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="HRK"; $options[] = $option;
+        $option = new KObject(); $option->text = "INR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="INR"; $options[] = $option;
+        $option = new KObject(); $option->text = "RON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="RON"; $options[] = $option;
+        $option = new KObject(); $option->text = "RSD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="RSD"; $options[] = $option;
+        $option = new KObject(); $option->text = "RUB&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="RUB"; $options[] = $option;
+        $option = new KObject(); $option->text = "VND&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="VND"; $options[] = $option;
+        $option = new KObject(); $option->text = "ZAR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="ZAR"; $options[] = $option;
+        $option = new KObject(); $option->text = "NGN&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="NGN"; $options[] = $option;
+        $option = new KObject(); $option->text = "KWD&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Not supported by PayPal)"; $option->value="KWD"; $options[] = $option;
+
+        //Add the options to the config object
+        $config->options = $options;
+        
+        return $this->optionlist($config);
+    }
+
+    /* DEPRECATED, SHOULD BE DELETED IN NEXT RELEASE */
     public function time( $config = array())
     {
         $config = new KConfig($config);
@@ -463,7 +529,114 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         return $this->optionlist($config);
     }
 
+    public function timeH( $config = array())
+    {
+        $config = new KConfig($config);
+        $config->append(array(
+            'name'      => 'enabled',
+            'attribs'   => array(),
+            'deselect'  => true,
+            'prompt'    => 'OHANAH_SELECT',
+        ))->append(array(
+            'selected'  => $config->{$config->name}
+        ));
+        
+        $options = array();       
+        
+        if (JComponentHelper::getParams('com_ohanah')->get('timeFormat') == '1') {
+            
+            $options[] = $this->option(array('text' => JText::_('12') , 'value' => '12' ));
+            $options[] = $this->option(array('text' => JText::_('01') , 'value' => '01' ));
+            $options[] = $this->option(array('text' => JText::_('02') , 'value' => '02' ));
+            $options[] = $this->option(array('text' => JText::_('03') , 'value' => '03' ));
+            $options[] = $this->option(array('text' => JText::_('04') , 'value' => '04' ));
+            $options[] = $this->option(array('text' => JText::_('05') , 'value' => '05' ));
+            $options[] = $this->option(array('text' => JText::_('06') , 'value' => '06' ));
+            $options[] = $this->option(array('text' => JText::_('07') , 'value' => '07' ));
+            $options[] = $this->option(array('text' => JText::_('08') , 'value' => '08' ));
+            $options[] = $this->option(array('text' => JText::_('09') , 'value' => '09' ));
+            $options[] = $this->option(array('text' => JText::_('10') , 'value' => '10' ));
+            $options[] = $this->option(array('text' => JText::_('11') , 'value' => '11' ));
 
+        } else {
+            $options[] = $this->option(array('text' => JText::_('00') , 'value' => '00' ));
+            $options[] = $this->option(array('text' => JText::_('01') , 'value' => '01' ));
+            $options[] = $this->option(array('text' => JText::_('02') , 'value' => '02' ));
+            $options[] = $this->option(array('text' => JText::_('03') , 'value' => '03' ));
+            $options[] = $this->option(array('text' => JText::_('04') , 'value' => '04' ));
+            $options[] = $this->option(array('text' => JText::_('05') , 'value' => '05' ));
+            $options[] = $this->option(array('text' => JText::_('06') , 'value' => '06' ));
+            $options[] = $this->option(array('text' => JText::_('07') , 'value' => '07' ));
+            $options[] = $this->option(array('text' => JText::_('08') , 'value' => '08' ));
+            $options[] = $this->option(array('text' => JText::_('09') , 'value' => '09' ));
+            $options[] = $this->option(array('text' => JText::_('10') , 'value' => '10' ));
+            $options[] = $this->option(array('text' => JText::_('11') , 'value' => '11' ));
+            $options[] = $this->option(array('text' => JText::_('12') , 'value' => '12' ));
+            $options[] = $this->option(array('text' => JText::_('13') , 'value' => '13' ));
+            $options[] = $this->option(array('text' => JText::_('14') , 'value' => '14' ));
+            $options[] = $this->option(array('text' => JText::_('15') , 'value' => '15' ));
+            $options[] = $this->option(array('text' => JText::_('16') , 'value' => '16' ));
+            $options[] = $this->option(array('text' => JText::_('17') , 'value' => '17' ));
+            $options[] = $this->option(array('text' => JText::_('18') , 'value' => '18' ));
+            $options[] = $this->option(array('text' => JText::_('19') , 'value' => '19' ));
+            $options[] = $this->option(array('text' => JText::_('20') , 'value' => '20' ));
+            $options[] = $this->option(array('text' => JText::_('21') , 'value' => '21' ));
+            $options[] = $this->option(array('text' => JText::_('22') , 'value' => '22' ));
+            $options[] = $this->option(array('text' => JText::_('23') , 'value' => '23' ));
+        }
+        //Add the options to the config object
+        $config->options = $options;
+        
+        return $this->optionlist($config);
+    }
+
+    public function timeM( $config = array())
+    {
+        $config = new KConfig($config);
+        $config->append(array(
+            'name'      => 'enabled',
+            'attribs'   => array(),
+            'deselect'  => true,
+            'prompt'    => 'OHANAH_SELECT',
+        ))->append(array(
+            'selected'  => $config->{$config->name}
+        ));
+        
+        $options = array();       
+        
+        $options[] = $this->option(array('text' => JText::_('00') , 'value' => '00' ));
+        $options[] = $this->option(array('text' => JText::_('15') , 'value' => '15' ));
+        $options[] = $this->option(array('text' => JText::_('30') , 'value' => '30' ));
+        $options[] = $this->option(array('text' => JText::_('45') , 'value' => '45' ));
+
+        //Add the options to the config object
+        $config->options = $options;
+        
+        return $this->optionlist($config);
+    }
+
+    public function timeAMPM( $config = array())
+    {
+        $config = new KConfig($config);
+        $config->append(array(
+            'name'      => 'enabled',
+            'attribs'   => array(),
+            'deselect'  => true,
+            'prompt'    => 'OHANAH_SELECT',
+        ))->append(array(
+            'selected'  => $config->{$config->name}
+        ));
+        
+        $options = array();       
+        
+        $options[] = $this->option(array('text' => JText::_('AM') , 'value' => 'AM' ));
+        $options[] = $this->option(array('text' => JText::_('PM') , 'value' => 'PM' ));
+
+        //Add the options to the config object
+        $config->options = $options;
+        
+        return $this->optionlist($config);
+    }
 
     public function module_chrome($config = array())
     {
@@ -503,7 +676,28 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
 
     public function module_positions($config = array())
     {
-        jimport('joomla.filesystem.folder');
+        jimport('joomla.filesystem.folder');       
+
+        $options = array();
+
+        $config = new KConfig($config);
+        
+        foreach($config->positions as $position)
+        {
+            $options[] = $this->option(array('text' => $position , 'value' => $position ));    
+        }
+        
+        $config->append(array(
+            'name'      => $config->{$config->name},
+        ))->append(array(
+            'selected'  => $config->{$config->name}
+        ));
+        $config->options = $options;
+        
+        return $this->optionlist($config);
+    }
+    
+    public function getModulePositions() {
 
         //Get the database object
         $db =& JFactory::getDBO();
@@ -526,7 +720,6 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
             $db->setQuery( $query );
             $templates = $db->loadObjectList();
         }
-
 
         // Get a list of all module positions as set in the database
         $query = 'SELECT DISTINCT(position)'.
@@ -595,24 +788,8 @@ class ComOhanahTemplateHelperListbox extends ComDefaultTemplateHelperListbox
         sort($positions);
 
 
-        $options = array();
-
-        foreach($positions as $position)
-        {
-            $options[] = $this->option(array('text' => $position , 'value' => $position ));    
-        }
-        
-        $config = new KConfig($config);
-        $config->append(array(
-            'name'      => $config->{$config->name},
-        ))->append(array(
-            'selected'  => $config->{$config->name}
-        ));
-        $config->options = $options;
-        
-        return $this->optionlist($config);
+        return $positions;
     }
-    
     
     protected function _searchTemplate($template, $path)
     {

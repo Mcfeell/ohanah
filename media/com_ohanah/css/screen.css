@@ -421,4 +421,5 @@
 
 label.error { display: block; padding-left: 0px; padding-top:5px; color: red;}
 
-
+.ohanah .fc-event { cursor: pointer; }
+.ohanah .fc-event:hover { cursor: pointer; text-decoration: underline;}

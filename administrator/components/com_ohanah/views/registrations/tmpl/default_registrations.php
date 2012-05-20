@@ -17,7 +17,7 @@
 		<td class="first">&nbsp;</td>
 		<td><?=@helper('grid.checkbox', array('row' => $registration))?></td>
 		<td width="1%"><a href="<?=@route('view=registration&id='.$registration->id)?>"><?=$registration->getGravatar()?></a></td>
-		<td><a href="<?=@route('view=registration&id='.$registration->id)?>">&nbsp;<?=$registration->name?></a></td>
+		<td>&nbsp;<a href="<?=@route('view=registration&id='.$registration->id)?>"><?=$registration->name?></a></td>
 		<td width="20%"><a href="<?=@route('view=registrations&layout=sendmail&ohanah_event_id='.KRequest::get('get.ohanah_event_id', 'int').'=&id[]='.$registration->id)?>"><?=$registration->email ?></a></td>
 		<td width="50%"><?=$registration->number_of_tickets ?></td>
 		<td align="center" width="80px"><?=@helper('grid.checked_in', array('row' => $registration)) ?></td>		

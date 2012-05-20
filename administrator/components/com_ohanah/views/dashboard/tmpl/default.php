@@ -42,5 +42,5 @@
 <div class="clr"></div>
 
 <p class="copyright">
-	ohanah app for joomla v 2.0
+	ohanah app for joomla v 2.0.14
 </p>

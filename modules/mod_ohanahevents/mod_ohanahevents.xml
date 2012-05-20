@@ -7,7 +7,7 @@
 	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
 	<authorEmail>info@beyounic.com</authorEmail>
 	<authorUrl>app.ohanah.com</authorUrl>
-	<version>1.2.0</version>
+	<version>2.0.14</version>
 	<description></description>
 	<files>
 		<filename module="mod_ohanahevents">mod_ohanahevents.php</filename>
@@ -34,12 +34,19 @@
 		
 		<param type="list" name="list_max_number" label="Max:" description="Max number of events to display" default="5">
 			<option value="1">1</option>
+			<option value="2">2</option>
 			<option value="3">3</option>
+			<option value="4">4</option>
 			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+			<option value="9">9</option>
+					<option value="10">10</option>
 			<option value="10">10</option>
 			<option value="10000">No limit</option>
 		</param>
-		<param type="list" name="displayStyle" label="LIST_STYLE" description="STYLE_OF_THE_LIST" default="normal">
+		<param type="list" name="displayStyle" label="Style of the list:" description="Style of the list" default="normal">
 			<option value="normal">Standard Ohanah event list</option>
 			<option value="ul_list">HTML UL list</option>
 		</param>
@@ -84,8 +91,14 @@
 					label="Max:"
 					description="Max number of events to display">
 					<option value="1">1</option>
+					<option value="2">2</option>
 					<option value="3">3</option>
+					<option value="4">4</option>
 					<option value="5">5</option>
+					<option value="6">6</option>
+					<option value="7">7</option>
+					<option value="8">8</option>
+					<option value="9">9</option>
 					<option value="10">10</option>
 					<option value="10000">No limit</option>
 				</field>
@@ -94,8 +107,8 @@
 					name="displayStyle"
 					type="list"
 					default="normal"
-					label="LIST_STYLE"
-					description="STYLE_OF_THE_LIST">
+					label="Style of the list:"
+					description="Style of the list">
 					<option value="normal">Standard Ohanah event list</option>
 					<option value="ul_list">HTML UL list</option>
 				</field>

@@ -1,6 +1,6 @@
 <? (defined('_JEXEC') && defined('KOOWA')) or die('Restricted access'); ?>
 
-<? if (JComponentHelper::getParams('com_ohanah')->get('enable_frontend')) : ?>
+<? if (JComponentHelper::getParams('com_ohanah')->get('enable_frontend') && !$event->id) : ?>
 
 	<?
 	// Load language file
@@ -9,8 +9,33 @@
 	$lang->load('com_ohanah', JPATH_ADMINISTRATOR);
 	?>
 
+	<? 
+	if (JComponentHelper::getParams('com_ohanah')->get('useStandardJoomlaEditor')) {
+	    $config = new KConfig();
+	    $config->append(array(
+	        'editor'    => null,
+	        'name'      => 'description',
+	        'width'     => '100%',
+	        'height'    => '291',
+	        'cols'      => '100',
+	        'rows'      => '20',
+	        'buttons'   => true,
+	        'options'   => array()
+	    ));
+
+	    $editor  = JFactory::getEditor($config->editor);
+	    $options = KConfig::unbox($config->options);
+
+	    if (version_compare(JVERSION, '1.6.0', 'ge')) { 
+	        $editorResult = $editor->display($config->name, $config->{$config->name}, $config->width, $config->height, $config->cols, $config->rows, KConfig::unbox($config->buttons), $config->name, null, null, $options); 
+	    } else { 
+	        $editorResult = $editor->display($config->name, $config->{$config->name}, $config->width, $config->height, $config->cols, $config->rows, KConfig::unbox($config->buttons), $options); 
+	    } 
+	}
+	?>
+
 	<style src="media://com_ohanah/v2/frontend-event-form.css" />
-	<div class="panelContent">
+	<div class="panelContent ohanah">
 
 		<? if (($params->get('loadJQuery') != '0') && (!JFactory::getApplication()->get('jquery'))) : ?>
 			<script src="media://com_ohanah/js/jquery.min.js" />
@@ -26,11 +51,11 @@
 		<script src="media://com_ohanah/js/jquery.form.js" />
 		<script src="media://com_ohanah/js/si.files.js" />
 
-		<style src="media://com_ohanah/v2/ohanah_css/custom-theme/jquery-ui-1.8.14.custom.css" />
+		<style src="media://com_ohanah/css/jquery-ui.css" />
 		<script src="media://com_ohanah/js/jquery-ui.custom.min.js" />
 		<style src="media://com_ohanah/v2/ohanah_css/jquery.cleditor.css" />
 
-		<?= @template('com://admin/ohanah.view.common.images', array('item' => $event, 'name' => 'event')); ?>
+		<?= @template('images', array('item' => $event, 'name' => 'event')); ?>
 
 		<script>
 			var $jq = jQuery.noConflict();  
@@ -281,7 +306,7 @@
 									<tr>
 										<td colspan="2"><span class="fieldTitle"><?=@text('OHANAH_DESCRIPTION')?></span><br/>
 											<? if (JComponentHelper::getParams('com_ohanah')->get('useStandardJoomlaEditor')) : ?>			
-												<?= @editor( array('height' => '291', 'cols' => '100', 'rows' => '20')); ?>
+												<?= $editorResult; ?>
 											<? else : ?>
 												<textarea class="description" name="description" id="description_textarea" style="border: 1px lightgray solid;"><?=$event->description?></textarea>
 											<? endif ?>
@@ -346,35 +371,9 @@
 
 											<div class="dropdownWrapper">
 												<div class="dropdown size3">
-													<? $opts = array();
-													$opt = new KObject(); $opt->text = "USD"; $opt->value="USD"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "EUR"; $opt->value="EUR"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "GBP"; $opt->value="GBP"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "CHF"; $opt->value="CHF"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "CAD"; $opt->value="CAD"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "JPY"; $opt->value="JPY"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "AUD"; $opt->value="AUD"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "BRL"; $opt->value="BRL"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "CZK"; $opt->value="CZK"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "DKK"; $opt->value="DKK"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "HKD"; $opt->value="HKD"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "HUF"; $opt->value="HUF"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "ILS"; $opt->value="ILS"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "JPY"; $opt->value="JPY"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "MYR"; $opt->value="MYR"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "MXN"; $opt->value="MXN"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "NOK"; $opt->value="NOK"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "NZD"; $opt->value="NZD"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "PHP"; $opt->value="PHP"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "PLN"; $opt->value="PLN"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "SGD"; $opt->value="SGD"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "SEK"; $opt->value="SEK"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "TWD"; $opt->value="TWD"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "THB"; $opt->value="THB"; $opts[] = $opt;
-													$opt = new KObject(); $opt->text = "TRY"; $opt->value="TRY"; $opts[] = $opt;
-													?>
 													<? if ($event->payment_currency) $default = $event->payment_currency; else $default = JComponentHelper::getParams('com_ohanah')->get('payment_currency'); ?>
-													<?= @helper('select.optionlist', array('name' => 'payment_currency',  'options' => $opts, 'selected' => $default)); ?><br />
+													<?=@helper('com://admin/ohanah.template.helper.listbox.currency', array('selected' => $default)) ?>
+													<br />
 												</div>
 											</div>
 										</td>
@@ -391,7 +390,7 @@
 								</table>
 
 								<div class="block">
-									<table style="margin-bottom:14px;">
+									<table style="margin-bottom:14px;" class="ohanah_form_picture">
 										<tr>
 											<td><span class="fieldTitle"><?=@text('OHANAH_EVENT_PICTURE')?></span><br />
 												<div id="eventPicture">
@@ -401,7 +400,7 @@
 											<input type="hidden" name="picture" id="picture" value="<?=$event->picture?>" />
 										</tr>
 									</table>
-									<table>
+									<table class="ohanah_form_photos">
 										<tr>
 											<td><span class="fieldTitle"><?=@text('OHANAH_PHOTOS')?><br />
 												<div id="eventPhotos">
@@ -434,15 +433,20 @@
 				$jq('.button[name="Submit"], input[name="Submit"]').click(function() {
 					if ($('edit-form').validate()) {
 						$jq('.button[name="Submit"], input[name="Submit"]').attr("disabled", true); 
-						$jq('.button[name="Submit"], input[name="Submit"]').text('<?=@text('OHANAH_ADDING_EVENT')?>');
+						if (!($jq.browser.msie && ($jq.browser.version<='8.0'))) {
+ 							$jq('.button[name="Submit"], input[name="Submit"]').text('<?=@text('OHANAH_ADDING_EVENT')?>');	
+ 						}
 
+						<? if (JComponentHelper::getParams('com_ohanah')->get('useStandardJoomlaEditor')) : ?>
+							var desc = <?=$editor->getContent('description')?>
+						<? endif ?>
 						$jq.ajax({
 						    type: 'post', 
-							url: 'index.php?option=com_ohanah&view=event',
-							data: $jq('#edit-form').serialize(),
+							url: 'http://<?=$_SERVER['HTTP_HOST'].KRequest::root()?>/index.php?option=com_ohanah&view=event',
+							data: $jq('#edit-form').serialize()<? if (JComponentHelper::getParams('com_ohanah')->get('useStandardJoomlaEditor')) : ?>+'&description='+desc<? endif ?>,
 						    success: function (data, text) {
 								alert('<?=@text('OHANAH_EVENT_ADDED')?>');
-								location.reload();
+								window.location = "<?=JComponentHelper::getParams('com_ohanah')->get('redirect_after_add_event', '')?>";
 						    }
 						});
 					}

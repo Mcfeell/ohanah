@@ -1,6 +1,6 @@
 <? (defined('_JEXEC') && defined('KOOWA')) or die('Restricted access'); ?>
 
-<style src="media://com_ohanah/v2/ohanah_css/custom-theme/jquery-ui-1.8.14.custom.css" />
+<style src="media://com_ohanah/css/jquery-ui.css" />
 
 <?=@helper('behavior.mootools'); ?>
 <script src="media://lib_koowa/js/koowa.js" />

@@ -1,6 +1,6 @@
 <?php
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		mod_sidebar
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -43,9 +43,8 @@ class ModOhanaheventsHtml extends ModDefaultHtml
 			->set('enabled', 1)
 			->set('direction', $direction)
 			->set('limit', $this->params->get('list_max_number'));
-			
-
-			$model->set('featured', $this->params->get('showOnlyFeatured'));
+		
+		$model->set('featured', $this->params->get('showOnlyFeatured'));
 		
 		$this->assign('events', $model->getList());
 		$this->assign('displayStyle', $this->params->get('displayStyle'));

@@ -1,6 +1,6 @@
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -88,8 +88,15 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 		}
 		
 		$config->request->append(array(
-		    'sort' => 'date'
+		    'sort' => array('date', 'start_time'),
+		    'enabled' => 1
 		));
+
+		if (!JFactory::getApplication()->getPageParameters()->get('usePagination', 1)) {
+			$config->request->append(array(
+			    'limit' => 10000000
+			));
+		}
 
 		if (JFactory::getApplication()->getPageParameters()->get('usePagination')) {
 			$config->request->append(array('limit' => $pageParameters->get('eventsPerPage')));			
@@ -102,7 +109,45 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 		if (JComponentHelper::getParams('com_ohanah')->get('enable_frontend')) {
 			$this->registerCallback('after.add', array($this, 'sendNotifications'));	
 		}
+
+		$this->registerCallback('before.add', array($this, 'fixEmptySlugs'));
 	}
+
+	public function fixEmptySlugs() {
+		$eventsWithoutSlug = $this->getService('com://admin/ohanah.model.events')->set('emptySlug', '1')->getList();
+
+		foreach ($eventsWithoutSlug as $event) {
+			$event->slug = $this->_createSlug($event->title);
+			$event->save();
+		}
+	}
+
+   	protected function _createSlug($title)
+    {
+        $slug = $this->getService('com://admin/ohanah.filter.slug')->sanitize($title);
+        return $this->_canonicalizeSlug($slug);
+    }
+    
+    protected function _canonicalizeSlug($slug)
+    {
+        $table = $this->getModel()->getTable();        
+
+        $db    = $table->getDatabase();
+        $query = $db->getQuery()
+                    ->select('slug')
+                    ->where('slug', 'LIKE', $slug.'-%');
+        
+        $slugs = $table->select($query, KDatabase::FETCH_FIELD_LIST);
+        
+        $i = 1;
+        while(in_array($slug.'-'.$i, $slugs)) {
+            $i++;
+        }
+        
+        $slug = $slug.'-'.$i;
+
+        return $slug;
+    }
 
 	public function sendNotifications($params) {
 
@@ -152,7 +197,7 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 
 		return $data;
 	}
-	
+
 	protected function _actionAdd(KCommandContext $context) 
 	{
 		$data = $context->data;
@@ -162,8 +207,8 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 
 		$this->_processImages('temp_event', $data->random_id, $row->id);
 		$this->getService('com://admin/ohanah.controller.mixpanel')->ohstats('event_added', array());
-
 		$this->_message = JText::_('OHANAH_EVENT_ADDED');
+
 		return $row;
 	}
 

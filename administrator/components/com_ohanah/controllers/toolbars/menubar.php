@@ -2,7 +2,7 @@
 
 <?php 
 /**
- * @version	2.0.1
+ * @version	2.0.14
  * @package	com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license	GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -16,13 +16,16 @@ class ComOhanahControllerToolbarMenubar extends ComDefaultControllerToolbarMenub
         $name = $this->getController()->getIdentifier()->name;
         
         $parameters = ''; 
-        if (KRequest::get('get.recurringParent', 'int')) $parameters = '&recurringParent=0';
-        if (KRequest::get('get.published', 'string')) $parameters = '&published=';
-        if (KRequest::get('get.ohanah_category_id', 'int')) $parameters = '&ohanah_category_id=0';
-        if (KRequest::get('get.search', 'string')) $parameters = '&search=';
-        if (KRequest::get('get.ohanah_venue_id', 'string')) $parameters = '&ohanah_venue_id=';
-        if (KRequest::get('get.frontend_submitted', 'string')) $parameters = '&frontend_submitted=';
-        if (KRequest::get('get.ohanah_venue_id', 'int')) $parameters = '&ohanah_venue_id=';
+
+        $state = $this->getController()->getModel()->getState();
+
+        if ($state->recurringParent) $parameters .= '&recurringParent=0';
+        if ($state->published) $parameters .= '&published=';
+        if ($state->ohanah_category_id) $parameters .= '&ohanah_category_id=0';
+        if ($state->search) $parameters .= '&search=';
+        if ($state->ohanah_venue_id) $parameters .= '&ohanah_venue_id=';
+        if ($state->frontend_submitted) $parameters .= '&frontend_submitted=';
+        if ($state->ohanah_venue_id) $parameters .= '&ohanah_venue_id=';
         
         $this->addCommand('OHANAH_DASHBOARD', array(
             'href'   => JRoute::_('index.php?option=com_ohanah&view=dashboard'),

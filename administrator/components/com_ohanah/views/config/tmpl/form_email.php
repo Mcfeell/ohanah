@@ -130,7 +130,7 @@
 							<tr>
 								<td style="width:60%;">
 									<span class="fieldTitle"><?=@text('OHANAH_SUBJECT');?></span><br/>
-									<input class="text" type="text" name="subject_mail_new_registration_organizer" id="subject_mail_new_event" value="<? if (isset($params->subject_mail_new_registration_organizer)) echo $params->subject_mail_new_registration_organizer?>" style="width:460px" />
+									<input class="text" type="text" name="subject_mail_new_registration_organizer" id="subject_mail_new_registration_organizer" value="<? if (isset($params->subject_mail_new_registration_organizer)) echo $params->subject_mail_new_registration_organizer?>" style="width:460px" />
 									<br/>
 								</td>
 							</tr>

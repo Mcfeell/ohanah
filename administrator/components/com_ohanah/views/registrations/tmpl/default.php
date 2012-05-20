@@ -9,7 +9,7 @@
 #submenu-box .m { display: none;}
 </style>
 
-<? $registrations = $this->getService('com://admin/ohanah.model.registrations')->set('ohanah_event_id', KRequest::get('get.ohanah_event_id', 'string'))->getList() ?>
+<? $registrations = $this->getService('com://admin/ohanah.model.registrations')->set('ohanah_event_id', KRequest::get('get.ohanah_event_id', 'string'))->set('hasPaid', KRequest::get('get.hasPaid', 'string'))->getList() ?>
 
 <? $count = 0; ?>
 <? foreach ($registrations as $registration) { if (!$registration->paid) $count++; } ?>
@@ -29,7 +29,7 @@
 							<? $link = 'view=registrations&layout=sendmail&ohanah_event_id='.KRequest::get('get.ohanah_event_id', 'int'); ?>
 							<? foreach ($registrations as $registration) if (!$registration->paid) $link .= '&id[]='.$registration->id; ?>
 							<a class="toolbar" href="<?=@route($link)?>">
-							<span title="About" class="icon-32-about"></span>
+								<span title="About" class="icon-32-about"></span>
 								<?=@text('OHANAH_SEND_A_REMINDER')?>
 							</a>
 						</td>
@@ -42,7 +42,7 @@
 			<? if ($count == 1) : ?>
 				<?=@text('OHANAH_PERSON_HASNT_PAID_YET_SINGULAR')?>
 			<? else : ?>
-				<?=JText::sprintf('OHANAH_PERSON_HASNT_PAID_YET_PLURAL', count($registrations))?>
+				<?=JText::sprintf('OHANAH_PERSON_HASNT_PAID_YET_PLURAL', $count)?>
 			<? endif ?>
 		</div>
 	</div>
@@ -53,7 +53,7 @@
 <form action="" method="get" class="-koowa-grid">
 
 	<div id="filterHeader">
-		<div class="filter">Filter: <?=@helper('grid.search');?></div>
+		<!--<div class="filter">Filter: <?=@helper('grid.search');?></div>-->
 							
 		<div id="selectors">
 			<ul class="selector">

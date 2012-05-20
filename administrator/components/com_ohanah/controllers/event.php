@@ -2,7 +2,7 @@
 
 <?php 
 /**
- * @version		2.0.1
+ * @version		2.0.14
  * @package		com_ohanah
  * @copyright	Copyright (C) 2012 Beyounic SA. All rights reserved.
  * @license		GNU GPLv3 <http://www.gnu.org/licenses/gpl.html>
@@ -16,10 +16,10 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 	public function __construct(KConfig $config)
 	{
 		if (KRequest::get('get.view', 'string') == 'events' && !KRequest::get('get.recurringParent', 'int')) {
-			$config->request->append(array('recurringParent' => 0));	
+			$config->request->append(array('recurringParent' => 0));
 		}
 
-		if (KRequest::get('get.view', 'string') == 'events' && !KRequest::get('get.filterEvents', 'string')) {
+		if (KRequest::get('get.view', 'string') == 'events' && !KRequest::get('get.filterEvents', 'string') && !KRequest::get('post.action', 'string')) {
 			$config->request->append(array('filterEvents' => 'notpast'));	
 		}
 
@@ -28,7 +28,45 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 		if (JComponentHelper::getParams('com_ohanah')->get('enableMailchimp')) {
 			$this->registerCallback('before.apply', array($this, 'populateListOnMailchimp'));
 		}
+
+		$this->registerCallback('before.save', array($this, 'fixEmptySlugs'));
 	}	
+
+	public function fixEmptySlugs() {
+		$eventsWithoutSlug = $this->getService('com://admin/ohanah.model.events')->set('emptySlug', '1')->getList();
+
+		foreach ($eventsWithoutSlug as $event) {
+			$event->slug = $this->_createSlug($event->title);
+			$event->save();
+		}
+	}
+
+   	protected function _createSlug($title)
+    {
+        $slug = $this->getService('com://admin/ohanah.filter.slug')->sanitize($title);
+        return $this->_canonicalizeSlug($slug);
+    }
+    
+    protected function _canonicalizeSlug($slug)
+    {
+        $table = $this->getModel()->getTable();        
+
+        $db    = $table->getDatabase();
+        $query = $db->getQuery()
+                    ->select('slug')
+                    ->where('slug', 'LIKE', $slug.'-%');
+        
+        $slugs = $table->select($query, KDatabase::FETCH_FIELD_LIST);
+        
+        $i = 1;
+        while(in_array($slug.'-'.$i, $slugs)) {
+            $i++;
+        }
+        
+        $slug = $slug.'-'.$i;
+
+        return $slug;
+    }
 		
 	public function populateListOnMailchimp() {
 		$event = $this->getService('com://admin/ohanah.model.events')->id(KRequest::get('get.id', 'int'))->getItem();
@@ -164,7 +202,7 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 			$images = $this->getService('com://admin/ohanah.model.attachments')->set('target_type', 'event')->set('target_id', $original_id)->getList();
 
 			for ($i = 1; $i <= $number; $i++) {
-				$data['slug'] = $originalSlug.'-'.$i;
+				unset($data['slug']);
 				$new_event = $this->getService('com://admin/ohanah.model.events')->getItem();
 												
 				$new_event->id = null;
@@ -301,7 +339,7 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 
 				for ($i = 1; $i <= $number; $i++) {
 
-					$data['slug'] = $originalSlug.'-'.$i; //TODO: FIxo per slug tetetete-2-1 tetetete-3-1
+					unset($data['slug']);
 					$row = $this->getService('com://admin/ohanah.model.events')->getItem();
 													
 	    			$startDateEvent = new KDate(new KConfig(array('date' => $oldest->date)));
@@ -367,7 +405,15 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 		$data = $this->reverseGeocode($data);
 		$data = $this->_processCustomFields($data);
 		$data = $this->_processVenue($data);
-		
+		$data = $this->_processTime($data);
+
+	
+		if ($data['close_registration_day'] == 'day' || $data['close_registration_day'] == '1970-01-01') {
+			$data['close_registration_day'] = '0000-00-00';
+		}
+
+		//Checkboxes
+		if ($data['allow_only_one_ticket'] != null) $data['allow_only_one_ticket'] = 1; else $data['allow_only_one_ticket'] = 0;
 		if ($data['end_time_enabled'] != null) $data['end_time_enabled'] = 1; else $data['end_time_enabled'] = 0;
 
 		if ($data['title'] && !$data['ohanah_category_id']) {
@@ -378,6 +424,13 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 		return $data;
 	}
 	
+	protected function _actionDelete(KCommandContext $context)
+	{
+		foreach (KRequest::get('get.id', 'int') as $eventid) {
+			KService::get('com://admin/ohanah.model.events')->id($eventid)->getItem()->delete();
+		}
+	}	
+
 	protected function _actionAdd(KCommandContext $context) 
 	{
 		$data = $context->data;
@@ -395,7 +448,7 @@ class ComOhanahControllerEvent extends ComOhanahControllerCommon
 	}
 
 	protected function _actionEdit(KCommandContext $context)
-	{ 	
+	{
 		if (KRequest::get('get.view', 'string') == 'event') {
 			$data = $context->data; 
 			$eventDataBeforeEdit = $this->getService('com://admin/ohanah.model.events')->id(KRequest::get('get.id', 'int'))->getItem();
